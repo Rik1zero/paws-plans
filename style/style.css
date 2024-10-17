@@ -1,0 +1,79 @@
+
+/*colors*/
+.green{
+    background: #04A46C;
+}
+.light-blue{
+    background: #7074FF;
+}
+.blue{
+    background: #567BFF;
+}
+
+/*blocks*/
+
+.catPhoto{
+    width: 240px;
+    height: 240px;
+}
+
+.inline div{
+display:inline-block; /* Делаем блоки по горизонтали */
+display: -moz-inline-stack; /* Для FireFox 2, тот же самый, что и inline-block */
+vertical-align:top; /* Выравниваем их сверху */
+font-size:16px; /* Ставим дочкам размер шрифта, иначе примет значение родителя */
+/* Для IE 6 и IE 7 чтобы блоки были по горизонтали*/
+zoom: 1;
+display: inline;
+
+}
+
+.main{
+
+}
+body{
+        background:#A1BFDC;
+    margin:0 auto; /* Центрируем блоки */
+    width:100%; /* Задаем ширину 100%, чтобы сделать ее резиновой */
+   max-width:700px; /* Устанавливаем максимальную ширину */
+}
+
+.mainFrame{
+    background:#A1BFDC;
+    display: block;
+    position: static;
+    vertical-align: central;
+}
+
+div.inline{font-size:0;} /* Ставим родителю значение 0, чтобы убрать отступы у блоков*/
+.left-block{
+background:red;
+width:20%; /*Задаем ширину в процентах чтобы сделать ее резиновой*/
+height:300px; /* Высота блока */
+}
+.content{
+background:green;
+width:60%;
+height:300px;
+}
+.right-block{
+background:blue;
+width:20%;
+height:300px;
+}
+
+.informationBlock{
+}
+
+.catBar{
+    display: grid;
+    width: 1000px;
+    height: 240px;
+}
+
+.activitiesBar{
+
+}
+.menu{
+
+}
