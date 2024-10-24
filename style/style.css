@@ -3,6 +3,14 @@
     background: #04A46C;
 }
 
+.background-dark-grey{
+    background: #224D77
+}
+
+.orange{
+    background: #F55306;
+}
+
 .light-green {
     background: #58D705;
 }
@@ -22,6 +30,10 @@
     margin: 0 0 0 auto;
 }
 
+.mt-10{
+    margin-top:10px;
+}
+
 /*fonts*/
 .roboto-thin {
   font-family: "Roboto", sans-serif;
@@ -39,6 +51,7 @@
   font-family: "Roboto", sans-serif;
   font-weight: 400;
   font-style: normal;
+  font-size:12px !important;
 }
 
 .roboto-medium {
@@ -98,7 +111,7 @@
 /*blocks*/
 
 .catPhoto {
-    height: 50%;
+
     width: 240px;
 }
 
@@ -162,15 +175,89 @@ div.inline {
 .informationBlock {
     width: 100%;
     padding: 10px;
+    display: flex;
+    flex-direction: column;
+
+
 }
 
 .catBar {
     width: 100%;
-    height: 100%;
+    height: 200px;
 }
 
 .activitiesBar {
-    /* Дополнительные стили для .activitiesBar */
+    display: flex;
+    flex-direction: column;
+    padding: 10px 10px 10px 10px;
+}
+.activities-task {
+    border-radius: 10px;
+    background: #0F589F;
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.activities-task-text{
+    text-align:center;
+
+}
+
+.activities-check{
+    text-align: center; /* Центрирование дочерних элементов */
+    width:fit-content;
+    flex-direction:column;
+    margin-left:auto;
+}
+
+.activities-check .activities-checkBox{
+    width:50px;
+    height:50px;
+    background:white;
+    border-radius:5px;
+    border:2px solid #454545;
+    display:block;
+    position:relative;
+    vertical-align: middle; /* Центрирование по вертикали */
+    justify-content:center;
+    align-items:center;
+    display:flex;
+}
+
+.activities-check .activities-checkBox:before{
+    content:'';
+    background:green;
+    width:5px;
+    height: 25px;
+    left:50%;
+    border-radius:5px;
+    justify-content:center;
+    transform:translateX(-50%);
+    position:absolute;
+}
+
+.activities-check .activities-checkBox:after{
+    content:'';
+    background:green;
+    width:25px;
+    height: 5px;
+    top:50%;
+    border-radius:5px;
+    justify-content:center;
+    transform:translateY(-50%);
+    position:absolute;
+}
+
+
+.vertical-line{
+    width:5px;
+    height: 50px;
+    position: absolute;
+    border-radius:5px;
+    justify-content:center;
 }
 
 .menu {
@@ -186,9 +273,16 @@ div.inline {
 .level-bar {
     margin: 5px 0 0 -1px;
     display: inline-block;
-    position: relative;
     background: white;
     border-radius: 10px;
+}
+
+.level-mood-bar {
+    margin: 0 0 0 8px;
+    display: inline-block;
+    background: white;
+    border-radius: 10px;
+    width:100%;
 }
 
 .green-part{
@@ -199,4 +293,64 @@ div.inline {
 }
 .display-block {
     display: block;
+}
+
+.mood{
+    margin:5px 0 0 -1px;
+    flex-direction: column;
+}
+
+.mood-bar{
+    position:relative;
+}
+
+.procent-mood{
+    width:65%;
+    height:100%;
+    border-radius: 10px 0 0 10px;
+}
+
+.coin-icon{
+    background:url(../source/coin.svg) no-repeat;
+    width:20px;
+    height:21px;
+}
+
+.button {
+    border: 2px solid #454545;
+    background: #689CCF;
+    border-radius: 10px;
+    color: white;
+    border-style: solid;
+    padding: 5px;
+    vertical-align:baseline;
+
+}
+
+.button:hover {
+    background: #224D77
+}
+
+.button:active{
+    color:black;
+    background:white;
+}
+
+.coinline{
+    vertical-align:middle;
+    text-align:center;
+
+}
+
+.baseline{
+    margin-top: 5px;
+}
+
+.mt-2{
+    margin-top:2px;
+}
+
+.text-center{
+    text-align:center;
+    justify-content:center;
 }
