@@ -208,6 +208,7 @@ div.inline {
 
 .activitiesBar {
     display: flex;
+    position:relative;
     flex-direction: column;
     padding: 10px 10px 10px 10px;
 }
@@ -379,8 +380,58 @@ div.inline {
 }
 
 .menu {
-    /* Дополнительные стили для .menu */
+    background:#567BFF;
+    justify-content:center;
 }
+
+.type-button{
+    flex-direction:column;
+    margin: 5px auto 5px auto;
+}
+.marker-button{
+    flex-direction:column;
+    margin: 0 auto 0 auto;
+    background: #002FA6 40%;
+
+}
+
+.add-activities{
+    width:50px;
+    height:50px;
+    border-radius:100%;
+    background:#F55306;
+    right:10px;
+    bottom:10px;
+    position:absolute;
+
+}
+
+.add-activities:before{
+    content:'';
+    opacity:100%;
+    background:white;
+    width:5px;
+    height: 25px;
+    left:50%;
+    border-radius:5px;
+    justify-content:center;
+    transform:translateX(-50%);
+    position:absolute;
+}
+
+.add-activities:after{
+    opacity:100%;
+    content:'';
+    background:white;
+    width:25px;
+    height: 5px;
+    top:50%;
+    border-radius:5px;
+    justify-content:center;
+    transform:translateY(-50%);
+    position:absolute;
+}
+
 
 .level {
     width: 100%;
@@ -432,6 +483,29 @@ div.inline {
     background:url(../source/coin.svg) no-repeat;
     width:20px;
     height:21px;
+}
+
+.task-icon{
+    background:url(../source/task-icon.svg) no-repeat;
+    width:47px;
+    height:45px;
+}
+.dayleak-icon{
+    background:url(../source/dayleak-icon.svg) no-repeat;
+    width:45px;
+    height:45px;
+}
+
+.habit-icon{
+    background:url(../source/habit-icon.svg) no-repeat;
+    width:41px;
+    height:47px;
+}
+
+.settings-icon{
+    background:url(../source/settings.svg) no-repeat;
+    width:46px;
+    height:45px;
 }
 
 .button {
