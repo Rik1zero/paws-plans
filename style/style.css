@@ -3,8 +3,28 @@
     background: #04A46C;
 }
 
+.orange {
+    background:#F55306;
+}
+
+.font-dark-grey{
+    color:#4E5662;
+}
+
+.black{
+    background: #000000;
+}
+
+.font-black{
+    color: #000000;
+}
+
 .background-dark-grey{
-    background: #224D77
+    background: #224D77;
+}
+
+.font-light-grey{
+    color:#04A46C;
 }
 
 .orange{
@@ -201,19 +221,28 @@ div.inline {
     align-items: center;
 }
 
+.activities-task-negative {
+    border-radius: 10px;
+    background: #4E5662;
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .activities-task-text{
     text-align:center;
 
 }
 
-.activities-check{
+.activities-check-negative{
     text-align: center; /* Центрирование дочерних элементов */
     width:fit-content;
     flex-direction:column;
-    margin-left:auto;
 }
 
-.activities-check .activities-checkBox{
+.activities-check .activities-checkBox-negative{
     width:50px;
     height:50px;
     background:white;
@@ -227,9 +256,89 @@ div.inline {
     display:flex;
 }
 
+.activities-check .activities-checkBox-negative:before{
+    content:'';
+    opacity:100%;
+    background:#F55306;
+    width:25px;
+    height: 5px;
+    top:50%;
+    border-radius:5px;
+    justify-content:center;
+    transform:translateY(-50%);
+    position:absolute;
+}
+
+.activities-check .activities-checkBox-negative:after{
+    content:'';
+}
+
+.activities-check{
+    text-align: center; /* Центрирование дочерних элементов */
+    width:fit-content;
+    flex-direction:column;
+}
+
+
+.activities-check .activities-checkBox{
+    width:50px;
+    height:50px;
+    background:white;
+    border-radius:5px;
+    border:2px solid #454545;
+    position:relative;
+    vertical-align: middle; /* Центрирование по вертикали */
+    justify-content:center;
+    align-items:center;
+    display:flex;
+}
+
+.activities-check .activities-checkBox-{
+    content:'';
+    width:50px;
+    height:50px;
+    background:white;
+    border-radius:5px;
+    border:2px solid #454545;
+    display:block;
+    position:relative;
+    vertical-align: middle; /* Центрирование по вертикали */
+}
+
+.activities-check .activities-checkBox-greenMark{
+    width:50px;
+    height:50px;
+    background:white;
+    border-radius:5px;
+    border:2px solid #454545;
+    position:relative;
+    vertical-align: middle; /* Центрирование по вертикали */
+    justify-content:center;
+    align-items:center;
+    display:flex;
+}
+
+.activities-check .activities-checkBox-greenMark:before {
+    content: '';
+    width: 29px;
+    height: 30px;
+    background: url('./source/greenMark.svg') no-repeat;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.greenMark-icon{
+    background:url(..\source\greenMark.svg) no-repeat;
+    width:29px;
+    height:30px;
+}
+
 .activities-check .activities-checkBox:before{
     content:'';
-    background:green;
+    opacity:100%;
+    background:#58D705;
     width:5px;
     height: 25px;
     left:50%;
@@ -240,8 +349,9 @@ div.inline {
 }
 
 .activities-check .activities-checkBox:after{
+    opacity:100%;
     content:'';
-    background:green;
+    background:#58D705;
     width:25px;
     height: 5px;
     top:50%;
@@ -251,6 +361,14 @@ div.inline {
     position:absolute;
 }
 
+.activities-specifications{
+    display: flex;
+    color:white;
+}
+
+.z-index-99{
+    z-index:99;
+}
 
 .vertical-line{
     width:5px;
@@ -328,7 +446,7 @@ div.inline {
 }
 
 .button:hover {
-    background: #224D77
+    background: #224D77;
 }
 
 .button:active{
