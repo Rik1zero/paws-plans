@@ -381,17 +381,27 @@ div.inline {
 
 .menu {
     background:#567BFF;
-    justify-content:center;
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
 .type-button{
     flex-direction:column;
-    margin: 5px auto 5px auto;
+    width:100%;
+    justify-content:center;
+    align-items:center;
+    display:flex;
 }
 .marker-button{
     flex-direction:column;
-    margin: 0 auto 0 auto;
+    invert(1);
+    color:white;
+    width:100%;
+    align-items:center;
+    display:flex;
+    border-radius:15px;
     background: #002FA6 40%;
+    justify-content:center;
 
 }
 
@@ -403,7 +413,7 @@ div.inline {
     right:10px;
     bottom:10px;
     position:absolute;
-
+    display:block;
 }
 
 .add-activities:before{
@@ -413,10 +423,12 @@ div.inline {
     width:5px;
     height: 25px;
     left:50%;
+    top:25%;
     border-radius:5px;
     justify-content:center;
     transform:translateX(-50%);
     position:absolute;
+
 }
 
 .add-activities:after{
@@ -426,6 +438,7 @@ div.inline {
     width:25px;
     height: 5px;
     top:50%;
+    left:25%;
     border-radius:5px;
     justify-content:center;
     transform:translateY(-50%);
@@ -492,6 +505,7 @@ div.inline {
 }
 .dayleak-icon{
     background:url(../source/dayleak-icon.svg) no-repeat;
+    invert(100%);
     width:45px;
     height:45px;
 }
@@ -546,3 +560,91 @@ div.inline {
     text-align:center;
     justify-content:center;
 }
+
+.invert {
+
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
+.create-task{
+    top:25%;
+    width:100%;
+    position:absolute;
+    height:fit-content;
+    background:white;
+    border-radius:15px;
+    box-shadow:0px 4px 5px rgb(0,0,0,.25);
+    z-index:100;
+    padding:auto 10px auto 10px;
+    justify-content:center;
+    flex-direction:column;
+    text-align:center;
+}
+
+.form-txt{
+    border-radius:200px;
+    border:2px grey solid;
+
+}
+
+.button-confirm {
+    border: 2px solid black;
+    background: white;
+    border-radius: 15px;
+    color: black;
+    border-style: solid;
+    margin-right: 5px;
+    vertical-align:baseline;
+}
+
+.button-cancel{
+    border: 2px solid black;
+    background: white;
+    border-radius: 15px;
+    color: black;
+    border-style: solid;
+    margin-left: 10px;
+    vertical-align:baseline;
+}
+
+.horizontal-center{
+    justify-content:center;
+    text-align:center;
+    padding-top:22px;
+}
+
+.create-habit{
+    top:25%;
+    width:100%;
+    position:absolute;
+    height:196px;
+    background:white;
+    border-radius:15px;
+    box-shadow:0px 4px 5px rgb(0,0,0,.25);
+    z-index:100;
+    padding:auto 10px auto 10px;
+    justify-content:center;
+    flex-direction:column;
+    text-align:center;
+}
+
+.button-or{
+    border:none;
+    background:none;
+}
+.button-or:active{
+    border:4px #F55306 solid;
+    border-radius:20px;
+}
+
+.button- {
+    border: 2px solid black;
+    background: white;
+    border-radius: 15px;
+    color: black;
+    border-style: solid;
+    margin-right: 5px;
+    vertical-align:baseline;
+}
+
