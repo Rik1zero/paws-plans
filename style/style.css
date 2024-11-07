@@ -104,10 +104,11 @@
   font-style: italic;
 }
 
-.roboto-regular-italic {
+.roboto-regular {
   font-family: "Roboto", sans-serif;
   font-weight: 400;
-  font-style: italic;
+  font-style: normal;
+  font-size:24px !important;
 }
 
 .roboto-medium-italic {
@@ -160,14 +161,19 @@ body {
     margin: 0 auto; /* Центрируем блоки */
     width: 100%; /* Задаем ширину 100%, чтобы сделать ее резиновой */
     max-width: 700px; /* Устанавливаем максимальную ширину */
+    height:100%;
+    display:flex;
+    overflow:hidden;
 }
+
+html{height:100%;}
 
 .mainFrame {
     display: flex;
     flex-direction: column;
     background: #A1BFDC;
-    position: static;
     vertical-align: central;
+    position:relative;
 }
 
 div.inline {
@@ -206,10 +212,16 @@ div.inline {
     height: 200px;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 .activitiesBar {
     display: flex;
     position:relative;
     flex-direction: column;
+    height:100vh;
+    overflow: hidden;
     padding: 10px 10px 10px 10px;
 }
 .activities-task {
@@ -381,6 +393,9 @@ div.inline {
 
 .menu {
     background:#567BFF;
+    position:sticky;
+    bottom:0%;
+    width:100%;
     display:grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
 }
@@ -569,23 +584,30 @@ div.inline {
 
 .create-task{
     top:25%;
-    width:100%;
+    width:auto;
     position:absolute;
     height:fit-content;
     background:white;
     border-radius:15px;
     box-shadow:0px 4px 5px rgb(0,0,0,.25);
     z-index:100;
-    padding:auto 10px auto 10px;
+    padding:10px 60px 10px 60px;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
     justify-content:center;
     flex-direction:column;
     text-align:center;
 }
 
+.pd-15{
+    padding-top:15px;
+}
+
 .form-txt{
     border-radius:200px;
     border:2px grey solid;
-
+    padding:5px 10px 5px 10px;
 }
 
 .button-confirm {
@@ -598,6 +620,17 @@ div.inline {
     vertical-align:baseline;
 }
 
+.button-confirm:hover {
+    border: 2px solid #58D705;
+    transition: border 1s;
+}
+
+.button-confirm:active{
+    background:#58D705;
+    border: 2px solid black;
+    transition: background 0,5s;
+}
+
 .button-cancel{
     border: 2px solid black;
     background: white;
@@ -608,15 +641,25 @@ div.inline {
     vertical-align:baseline;
 }
 
+.button-cancel:hover{
+    border: 2px solid #F55306;
+    transition: border 0,5s;
+}
+
+.button-cancel:active{
+    border: 2px solid black;
+    background:#F55306;
+}
+
 .horizontal-center{
     justify-content:center;
     text-align:center;
-    padding-top:22px;
+    padding-top:15px;
 }
 
 .create-habit{
     top:25%;
-    width:100%;
+    width:auto;
     position:absolute;
     height:196px;
     background:white;
@@ -624,18 +667,34 @@ div.inline {
     box-shadow:0px 4px 5px rgb(0,0,0,.25);
     z-index:100;
     padding:auto 10px auto 10px;
+    margin:auto 10px auto 10px;
     justify-content:center;
     flex-direction:column;
     text-align:center;
 }
 
 .button-or{
-    border:none;
+    border:2px black;
     background:none;
+    margin-right:10px;
+    padding:5px 10px 5px 10px;
 }
 .button-or:active{
+    border:4px #58D705 solid;
+    border-radius:20px;
+    padding:1px 6px 1px 6px;
+}
+
+.button-or1{
+    border:2px;
+    background:none;
+    margin-left:10px;
+    padding:5px 10px 5px 10px;
+}
+.button-or1:active{
     border:4px #F55306 solid;
     border-radius:20px;
+    padding:1px 6px 1px 6px;
 }
 
 .button- {
