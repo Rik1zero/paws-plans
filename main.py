@@ -4,6 +4,8 @@ from fastapi.staticfiles import StaticFiles
 import os
 
 app = FastAPI()
+app.mount("/style", StaticFiles(directory="style"), name="style")
+app = FastAPI()
 
 
 # Маршрут для обслуживания index.html
@@ -11,7 +13,6 @@ app = FastAPI()
 async def read_index():
     with open("pages/index.html", "r") as file:
         return HTMLResponse(content=file.read())
-
 @app.get("/page", response_class=HTMLResponse)
 async def read_index():
     with open("pages/index.html", "r") as file:

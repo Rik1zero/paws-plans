@@ -408,12 +408,12 @@ div.inline {
 }
 
 .menu {
-    background:#567BFF;
-    position:sticky;
-    bottom:0%;
-    width:100%;
-    display:grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    background: #567BFF; /* Цвет фона меню */
+    position: sticky; /* Фиксированное положение внизу */
+    bottom: 0; /* Прикреплено к нижней части */
+    width: 100%; /* Ширина 100% */
+    display: flex; /* Используем flex для равномерного распределения элементов */
+    justify-content: space-between; /* Разделяет элементы равномерно */
 }
 
 .type-button{
@@ -525,31 +525,31 @@ div.inline {
 }
 
 .coin-icon{
-    background:url(../source/coin.svg) no-repeat;
+    background:url(../../source/coin.svg) no-repeat;
     width:20px;
     height:21px;
 }
 
 .task-icon{
-    background:url(../source/task-icon.svg) no-repeat;
+    background:url(../../source/task-icon.svg) no-repeat;
     width:47px;
     height:45px;
 }
 .dayleak-icon{
-    background:url(../source/dayleak-icon.svg) no-repeat;
+    background:url(../../source/dayleak-icon.svg) no-repeat;
     invert(100%);
     width:45px;
     height:45px;
 }
 
 .habit-icon{
-    background:url(../source/habit-icon.svg) no-repeat;
+    background:url(../../source/habit-icon.svg) no-repeat;
     width:41px;
     height:47px;
 }
 
 .settings-icon{
-    background:url(../source/settings.svg) no-repeat;
+    background:url(../../source/settings.svg) no-repeat;
     width:46px;
     height:45px;
 }
