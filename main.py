@@ -4,8 +4,7 @@ from fastapi.staticfiles import StaticFiles
 import os
 
 app = FastAPI()
-app.mount("pages/style", StaticFiles(directory="style"), name="style")
-app = FastAPI()
+
 
 
 # Маршрут для обслуживания index.html
