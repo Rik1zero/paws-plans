@@ -19,6 +19,10 @@
     color: #000000;
 }
 
+.font-white{
+    color:#FFFFFF;
+}
+
 .background-dark-grey{
     background: #224D77;
 }
@@ -132,8 +136,8 @@
 /*blocks*/
 
 .catPhoto {
-
-    width: 240px;
+    height:180px;
+    width: 180px;
 }
 
 .inline div {
@@ -154,6 +158,7 @@
 
 .main {
     /* Дополнительные стили для .main */
+    width:100%;
 }
 
 body {
@@ -174,6 +179,7 @@ html{height:100%;}
     background: #A1BFDC;
     vertical-align: central;
     position:relative;
+
 }
 
 div.inline {
@@ -209,7 +215,7 @@ div.inline {
 
 .catBar {
     width: 100%;
-    height: 200px;
+    height: 180px;
 }
 
 * {
@@ -224,12 +230,21 @@ div.inline {
     overflow: hidden;
     padding: 10px 10px 10px 10px;
 }
+
+.task-line{
+    width:auto;
+    height:2px;
+    background:white;
+    margin:2px 2px 0 2px;
+}
+
 .activities-task {
     border-radius: 10px;
     background: #0F589F;
     color: white;
     padding: 10px;
     display: flex;
+    margin-top:5px;
     justify-content: space-between;
     align-items: center;
 }
@@ -242,6 +257,7 @@ div.inline {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top:5px;
 }
 
 .activities-task-text{
@@ -416,6 +432,7 @@ div.inline {
     display:flex;
     border-radius:15px;
     background: #002FA6 40%;
+    fill: #002FA6 40%;
     justify-content:center;
 
 }
