@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 import os
 
 app = FastAPI()
-app.mount("/style", StaticFiles(directory="style"), name="style")
+app.mount("pages/style", StaticFiles(directory="style"), name="style")
 app = FastAPI()
 
 
