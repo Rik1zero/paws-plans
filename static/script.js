@@ -85,3 +85,28 @@ async function fetchHabities(endpoint, listElementId){
 fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
 
 fetchTasks(`/users/${user_id}/tasks`, "tasks-list");
+
+
+document.querySelectorAll('.menu div').forEach(item => {
+    item.addEventListener('click', function() {
+        // Удаляем класс 'active' у всех пунктов меню
+        document.querySelectorAll('.menu div').forEach(item => item.classList.remove('active'));
+
+        // Удаляем класс 'active' у всех секций контента
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.classList.remove('active');
+            section.style.display = 'none'; // Скрываем все секции
+        });
+
+        // Добавляем класс 'active' к выбранному пункту меню
+        this.classList.add('active');
+
+        // Определяем целевую секцию контента и добавляем ей класс 'active'
+        const targetContentId = this.getAttribute('data-target');
+        const targetContent = document.getElementById(targetContentId);
+        if (targetContent) {
+            targetContent.classList.add('active');
+            targetContent.style.display = 'block'; // Показываем выбранную секцию
+        }
+    });
+});

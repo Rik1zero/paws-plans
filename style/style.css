@@ -425,6 +425,30 @@ div.inline {
     justify-content: space-between; /* Разделяет элементы равномерно */
 }
 
+.menu div {
+    padding: 10px 20px;
+    cursor: pointer;
+    color: black;
+    border-radius: 5px;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.menu div.active {
+    background-color: #224D77;
+    color: white;
+    font-weight: bold;
+}
+
+.content-section {
+    display: none; /* Скрываем все секции контента по умолчанию */
+}
+
+.content-section.active {
+    display: block; /* Показываем только активную секцию */
+}
+
 .type-button{
     flex-direction:column;
     width:100%;
@@ -654,7 +678,7 @@ div.inline {
 .button-confirm:active{
     background:#58D705;
     border: 2px solid black;
-    transition: background 0,5s;
+    transition: background 0.5s;
 }
 
 .button-cancel{
