@@ -135,6 +135,15 @@
 
 /*blocks*/
 
+#tasks-list, habbities-list{
+    display: flex;
+    vertical-align: middle;
+    flex-direction: column;
+    position:relative;
+
+
+}
+
 .catPhoto {
     height:180px;
     width: 180px;

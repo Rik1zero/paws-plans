@@ -56,15 +56,24 @@ async function fetchHabities(endpoint, listElementId){
         const data = await response.json();
         const listElement = document.getElementById(listElementId);
         data.forEach(item => {
-            className = item.is_done ?'activities-task';
+          //  className = item.is_positive ?'activities-checkBox green':`activities-checkBox-negative`;
             const block = document.createElement('div');
-            block.innerHTML = `<div class="${className} roboto-bold">
-        <div> ${item.name}</div>
-            <div class="activities-check ml-auto">
-          <div class="activities-checkBox-green">
+            block.innerHTML =item.is_positive ? `<div class="activities-task roboto-bold">
+            <div>${item.name}</div>
+        <div class="activities-check ml-auto">
+          <div class="activities-checkBox green">
+              <div class="z-index-99 text-center mt-2 roboto-bold font-dark-grey">${item.times}</div>
           </div>
         </div>
-        </div>`
+        </div><br/>`:`<div class="activities-task roboto-bold">
+
+        <div class="activities-check ml-auto">
+          <div class="activities-checkBox-negative">
+              <div class="z-index-99 text-center mt-2 roboto-bold font-dark-grey">${item.times}</div>
+          </div>
+        </div>
+        <div class = "ml-auto">${item.name}</div>
+        </div><br/>`;
             listElement.appendChild(block);
         } );
     }
@@ -73,6 +82,6 @@ async function fetchHabities(endpoint, listElementId){
     }
 }
 
-fetchHabities(`/users/${user_id}/habbities`, "habbities-list");
+fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
 
 fetchTasks(`/users/${user_id}/tasks`, "tasks-list");
