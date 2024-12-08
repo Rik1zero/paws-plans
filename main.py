@@ -6,6 +6,8 @@ import uvicorn
 from model import *
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
+user_id = 1
 
 # Зависимость для получения сессии базы данных
 def get_db():
@@ -230,6 +232,27 @@ async def read_page():
     with open("pages/index.html", "r", encoding="utf-8") as file:
         return HTMLResponse(content=file.read())
 
+@app.get("/users/{user_id}/tasks")
+def read_user_tasks(user_id: int, db: Session = Depends(get_db)):
+    tasks = db.query(Task).filter(Task.user_id == user_id).all()
+    if tasks is None:
+        raise HTTPException(status_code=404, detail="tasks not found")
+    return tasks
+
+@app.get("/users/{user_id}/dailies")
+def read_user_dailies(user_id: int, db: Session = Depends(get_db)):
+    dailies = db.query(Daily).filter(Daily.user_id == user_id).all()
+    if dailies is None:
+        raise HTTPException(status_code=404, detail="dailies not found")
+    return dailies
+
+@app.get("/users/{user_id}/habbites")
+def read_user_habbites(user_id: int, db: Session = Depends(get_db)):
+    habbites = db.query(Habit).filter(Habit.user_id == user_id).all()
+    if habbites is None:
+        raise HTTPException(status_code=404, detail="habbites not found")
+    return habbites
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
-
