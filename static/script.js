@@ -19,13 +19,21 @@ async function fetchData(endpoint, listElementId){
     }
 }
 
+
 async function fetchUser(userId, informationBlockId) {
     try {
         const response = await fetch(`/users/${userId}`);
-        if (!response.ok) throw new Error('Ошибка сети');
+        if (!response.ok) {
+            throw new Error('Ошибка сети');
+        }
 
         const data = await response.json();
         const informationBlock = document.getElementById(informationBlockId);
+
+        if (!informationBlock) {
+            console.error('Указанный informationBlock не найден в DOM');
+            return;
+        }
 
         const level_id = data.level_id || 'неизвестно';
         const score = data.score || 0;
@@ -59,16 +67,13 @@ async function fetchUser(userId, informationBlockId) {
                 <button class="button roboto-bold ml-auto">магазин</button>
             </div>`;
 
-        if (informationBlock) {
-            informationBlock.innerHTML = '';
-            informationBlock.appendChild(block);
-        } else {
-            console.error('Указанный informationBlock не найден в DOM');
-        }
+        informationBlock.innerHTML = ''; // Очистить предыдущее содержимое
+        informationBlock.appendChild(block);
     } catch (error) {
         console.error('Ошибка при получении данных пользователя', error);
     }
 }
+
 
 
 async function fetchTasks(endpoint, listElementId){
@@ -139,27 +144,8 @@ fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
 fetchTasks(`/users/${user_id}/tasks`, "tasks-list");
 
 document.addEventListener("DOMContentLoaded", () => {
-    fetchUser(user_id, "user-info");
-    fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
-    fetchTasks(`/users/${user_id}/tasks`, "tasks-list");
-
-    document.querySelectorAll('.menu div').forEach(item => {
-        item.addEventListener('click', function() {
-            document.querySelectorAll('.menu div').forEach(item => item.classList.remove('active'));
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-                section.style.display = 'none';
-            });
-
-            this.classList.add('active');
-            const targetContentId = this.getAttribute('data-target');
-            const targetContent = document.getElementById(targetContentId);
-            if (targetContent) {
-                targetContent.classList.add('active');
-                targetContent.style.display = 'block';
-            }
-        });
-    });
+    const userId = 1; // Замените 1 на актуальный ID пользователя
+    fetchUser(userId, "user-info");
 });
 
 
