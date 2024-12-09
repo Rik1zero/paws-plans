@@ -254,5 +254,8 @@ def read_user_habbites(user_id: int, db: Session = Depends(get_db)):
     return habbites
 
 
+
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
