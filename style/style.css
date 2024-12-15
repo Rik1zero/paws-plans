@@ -151,7 +151,7 @@
 .catPhoto {
     height:180px;
     width: 180px;
-    background:url(../source/fon_project.png) no-repeat
+    background:url(../source/fon_project.png) no-repeat;
 }
 
 .inline div {

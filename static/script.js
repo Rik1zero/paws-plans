@@ -1,3 +1,4 @@
+
 const user_id = 1;
 
 async function fetchData(endpoint, listElementId){
@@ -20,60 +21,26 @@ async function fetchData(endpoint, listElementId){
 }
 
 
-async function fetchUser(userId, informationBlockId) {
-    try {
-        const response = await fetch(`/users/${userId}`);
-        if (!response.ok) {
-            throw new Error('Ошибка сети');
-        }
+async function fetchUser(userId) {
+          console.log("Fetching user data for user ID:", userId); // Добавьте это
+          try {
+              const response = await fetch(/users/${userId});
+              if (!response.ok) {
+                  throw new Error('Network response was not ok ' + response.statusText);
+              }
+              const userData = await response.json();
+              console.log("User data received:", userData); // И это
+              document.getElementById('user-info').innerText = JSON.stringify(userData);
+          } catch (error) {
+              console.error('There has been a problem with your fetch operation:', error);
+          }
+      }
 
-        const data = await response.json();
-        const informationBlock = document.getElementById(informationBlockId);
 
-        if (!informationBlock) {
-            console.error('Указанный informationBlock не найден в DOM');
-            return;
-        }
-
-        const level_id = data.level_id || 'неизвестно';
-        const score = data.score || 0;
-        const mood = data.mood || 0;
-        const money = data.money || 0;
-
-        const block = document.createElement('div');
-        block.innerHTML = `
-            <div class="level">
-                <div class="roboto-bold font-white">Уровень ${level_id}</div>
-                <div class="level-bar">
-                    <div class="green-part light-green roboto-bold">${score}</div>
-                </div>
-                <div class="inline">
-                    <div class="roboto-bold font-white">0</div>
-                    <div class="roboto-bold font-white ml-auto">800</div>
-                </div>
-            </div>
-            <div class="mood">
-                <div class="roboto-bold font-white">Настроение:</div>
-                <div class="mood-bar">
-                    <div class="roboto-bold font-white">${mood}%</div>
-                    <div class="level-mood-bar">
-                        <div class="procent-mood orange roboto-bold"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="coinline mt-10">
-                <div class="coin-icon baseline"></div>
-                <div class="roboto-bold font-white baseline">${money}</div>
-                <button class="button roboto-bold ml-auto">магазин</button>
-            </div>`;
-
-        informationBlock.innerHTML = ''; // Очистить предыдущее содержимое
-        informationBlock.appendChild(block);
-    } catch (error) {
-        console.error('Ошибка при получении данных пользователя', error);
-    }
-}
-
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("User data received:", userData);
+    fetchUser(1); // Здесь замените 1 на нужный id пользователя
+});
 
 
 async function fetchTasks(endpoint, listElementId){
@@ -142,12 +109,48 @@ async function fetchHabities(endpoint, listElementId){
 fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
 
 fetchTasks(`/users/${user_id}/tasks`, "tasks-list");
+console.log("js is working")
 
-document.addEventListener("DOMContentLoaded", () => {
-    const userId = 1; // Замените 1 на актуальный ID пользователя
-    fetchUser(userId, "user-info");
-});
 
+//document.addEventListener("DOMContentLoaded", () => {
+//    document.querySelectorAll('.menu .type-button, .menu .marker-button').forEach(item => {
+//        item.addEventListener('click', function() {
+//            console.log('Клик по элементу меню:', this.textContent.trim());
+//
+//            // Удаление класса 'active' у всех пунктов меню
+//            document.querySelectorAll('.menu div').forEach(item => item.classList.remove('active'));
+//
+//            // Добавление класса 'active' к выбранному пункту меню
+//            this.classList.add('active');
+//
+//            // Скрытие всех секций контента
+//            document.querySelectorAll('.content-section').forEach(section => {
+//                section.style.display = 'none';
+//            });
+//
+//            // Определение целевой секции контента и отображение
+//            let targetContentId;
+//            if (this.querySelector('.task-icon')) {
+//                targetContentId = 'tasks-content';
+//            } else if (this.querySelector('.dayleak-icon')) {
+//                targetContentId = 'dailies-content';
+//            } else if (this.querySelector('.habit-icon')) {
+//                targetContentId = 'habits-content';
+//            } else if (this.querySelector('.settings-icon')) {
+//                targetContentId = 'settings-content';
+//            }
+//
+//            if (targetContentId) {
+//                const targetContent = document.getElementById(targetContentId);
+//                if (targetContent) {
+//                    targetContent.style.display = 'block';
+//                } else {
+//                    console.error(`Целевая секция с ID ${targetContentId} не найдена`);
+//                }
+//            }
+//        });
+//    });
+//});
 
 document.querySelectorAll('.menu div').forEach(item => {
     item.addEventListener('click', function() {
