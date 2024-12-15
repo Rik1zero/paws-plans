@@ -260,7 +260,6 @@ div.inline {
     display: flex;
     margin-top:5px;
     justify-content: space-between;
-    align-items: center;
 }
 
 .activities-task-negative {
@@ -430,6 +429,23 @@ div.inline {
     justify-content: space-between; /* Разделяет элементы равномерно */
 }
 
+#taskList,
+#habbities-list{
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+.activities-task,
+.activities-task-negative {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    align-items: right;
+}
+
 .menu div {
     padding: 10px 20px;
     cursor: pointer;
@@ -441,8 +457,10 @@ div.inline {
 }
 
 .menu div.active {
-    background-color: #224D77;
-    color: white;
+    background: #ffd059 40%;
+    fill: #ffd059 40%;
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
     font-weight: bold;
 }
 
@@ -575,7 +593,6 @@ div.inline {
 }
 .dayleak-icon{
     background:url(../source/dayleak-icon.svg) no-repeat;
-    invert(100%);
     width:45px;
     height:45px;
 }
