@@ -69,6 +69,15 @@ def read_levels(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return db.query(Level).offset(skip).limit(limit).all()
 
 
+@app.get("/levels/{levels_id}")
+def read_levels(levels_id: int, db: Session = Depends(get_db)):
+    level = db.query(Level).filter(Level.levels_id == levels_id).first()  # Получаем всю запись уровня
+
+    if level is None:
+        raise HTTPException(status_code=404, detail="Уровень не найден")  # Обрабатываем случай, если уровень не найден
+
+    return level
+
 @app.delete("/levels/{levels_id}")
 def delete_level(levels_id: int, db: Session = Depends(get_db)):
     level = db.query(Level).filter(Level.levels_id == levels_id).first()

@@ -252,15 +252,6 @@ div.inline {
     margin:2px 2px 0 2px;
 }
 
-.activities-task {
-    border-radius: 10px;
-    background: #0F589F;
-    color: white;
-    padding: 10px;
-    display: flex;
-    margin-top:5px;
-    justify-content: space-between;
-}
 
 .activities-task-negative {
     border-radius: 10px;
@@ -315,14 +306,14 @@ div.inline {
     content:'';
 }
 
-.activities-check{
-    text-align: center; /* Центрирование дочерних элементов */
-    width:fit-content;
-    flex-direction:column;
+.activities-check {
+    display: flex;
+    align-items: center;
 }
 
 
 .activities-check .activities-checkBox{
+    cursor: pointer;
     width:50px;
     height:50px;
     background:white;
@@ -333,6 +324,11 @@ div.inline {
     justify-content:center;
     align-items:center;
     display:flex;
+}
+
+.activities-checkBox.checked {
+    background-color: #0F589F; /* Цвет при нажатии */
+    color: white; /* Цвет текста при нажатии */
 }
 
 .activities-check .activities-checkBox-{
@@ -443,7 +439,14 @@ div.inline {
     padding: 10px;
     box-sizing: border-box;
     border: 1px solid #ccc;
-    align-items: right;
+    align-items: center;
+    border-radius: 10px;
+    background: #0F589F;
+    color: white;
+    padding: 10px;
+    display: flex;
+    margin-top:5px;
+    justify-content: space-between;
 }
 
 .menu div {

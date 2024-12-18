@@ -48,7 +48,7 @@ async function fetchTasks(endpoint, listElementId) {
                 <div class="${className} roboto-bold" style="display: flex; justify-content: space-between; width: 100%;">
                     <div>${item.name}</div>
                     <div class="activities-check ml-auto">
-                        <div class="activities-checkBox-"></div>
+                        <div class="activities-checkBox-" data-checked="false"></div>
                     </div>
                 </div>`;
             listElement.appendChild(block);
@@ -77,28 +77,95 @@ async function fetchHabities(endpoint, listElementId) {
 
         data.forEach(item => {
             const block = document.createElement('div');
-            block.className = 'activities-task roboto-bold';
             block.innerHTML = item.is_positive
-                ? `<div>
-                    <div>${item.name}</div>
-                    <div class="activities-check ml-auto" style="margin-left:100% !important ; margin-right:0 !important;">
-                        <div class="activities-checkBox green">
-                            <div class="z-index-99 text-center mt-2 roboto-bold font-dark-grey">${item.times}</div>
-                        </div>
-                    </div>
-                </div>`
-                : `<div>
-                    <div class="activities-check ml-auto">
-                        <div class="activities-checkBox-negative">
-                            <div class="z-index-99 text-center mt-2 roboto-bold font-dark-grey">${item.times}</div>
-                        </div>
-                    </div>
-                    <div class="ml-auto">${item.name}</div>
-                </div>`;
+? `<div class="activities-task roboto-bold">
+      <div>${item.name}</div>
+      <div class="activities-check" style="margin-left: auto;">
+          <div class="activities-checkBox green">
+              <div class="z-index-99 text-center mt-2 roboto-bold font-dark-grey">${item.times}</div>
+          </div>
+      </div>
+  </div>`
+: `<div class="activities-task roboto-bold">
+      <div class="activities-check">
+          <div class="activities-checkBox-negative">
+              <div class="z-index-99 text-center mt-2 roboto-bold font-dark-grey">${item.times}</div>
+          </div>
+      </div>
+      <div class="ml-auto">${item.name}</div>
+  </div>`;
             listElement.appendChild(block);
         });
     } catch (error) {
         console.error('error fetching data', error);
+    }
+}
+
+async function fetchUser(user_id, information_block) {
+    console.log(`Запрос данных для пользователя с ID: ${user_id}`); // Логируем ID пользователя
+
+    try {
+        const response = await fetch(`/users/${user_id}`);
+        if (!response.ok) {
+            console.error('Ошибка сети:', response.status, response.statusText); // Логируем статус ошибки
+            throw new Error('Ошибка сети');
+        }
+
+        const data = await response.json();
+        console.log('Данные пользователя получены:', data); // Логируем полученные данные
+
+        const level_id = data.level_id || 'неизвестно' ;
+        const score = data.score || 0;
+        const mood = data.mood || 0;
+        const money = data.money || 0;
+
+        const levels = await fetch(`/levels/${level_id+1}`);
+
+        if (!levels.ok) {
+            console.error('Ошибка сети:', levels.status, levels.statusText); // Логируем статус ошибки
+            throw new Error('Ошибка сети');
+        }
+        const dataL = await levels.json();
+        const level_top = dataL.level_top || 0;
+
+        const block = document.createElement('div');
+        block.innerHTML = `
+            <div class="informationBlock vert">
+                <div class="level">
+                    <div class="roboto-bold font-white">Уровень ${level_id}</div>
+                    <div class="level-bar">
+                        <div class="green-part light-green roboto-bold">${score}</div>
+                    </div>
+                    <div class="inline">
+                        <div class="roboto-bold font-white">0</div>
+                        <div class="roboto-bold font-white ml-auto">${level_top}</div>
+                    </div>
+                </div>
+                <div class="mood">
+                    <div class="roboto-bold font-white">настроение:</div>
+                    <div class="mood-bar">
+                        <div class="roboto-bold font-white">${mood}%</div>
+                        <div class="level-mood-bar">
+                            <div class="procent-mood orange roboto-bold"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="coinline mt-10">
+                    <div class="coin-icon baseline"></div>
+                    <div class="roboto-bold font-white baseline">${money}</div>
+                    <button class="button roboto-bold ml-auto">магазин</button>
+                </div>
+            </div>`;
+
+        if (information_block) {
+            information_block.appendChild(block);
+            console.log('Информация добавлена в DOM'); // Логируем успешное добавление
+        } else {
+            console.error('Указанный information_block не найден в DOM');
+        }
+
+    } catch (error) {
+        console.error('Ошибка при получении данных', error); // Логируем ошибку
     }
 }
 
@@ -110,6 +177,8 @@ console.log("js is working")
  
  
 document.addEventListener("DOMContentLoaded", () => {
+   const information_block = document.getElementById('user-info');
+   fetchUser(user_id, information_block);
    document.querySelectorAll('.menu .type-button, .menu .marker-button').forEach(item => {
        item.addEventListener('click', function() {
            console.log('Клик по элементу меню:', this.textContent.trim());
@@ -148,27 +217,5 @@ document.addEventListener("DOMContentLoaded", () => {
        });
    });
 });
- 
-// document.querySelectorAll('.menu div').forEach(item => {
-//     item.addEventListener('click', function() {
-//         // Удаляем класс 'active' у всех пунктов меню
-//         document.querySelectorAll('.menu div').forEach(item => item.classList.remove('active'));
-//
-//         // Удаляем класс 'active' у всех секций контента
-//         document.querySelectorAll('.content-section').forEach(section => {
-//             section.classList.remove('active');
-//             section.style.display = 'none'; // Скрываем все секции
-//         });
-//
-//         // Добавляем класс 'active' к выбранному пункту меню
-//         this.classList.add('active');
-//
-//         // Определяем целевую секцию контента и добавляем ей класс 'active'
-//         const targetContentId = this.getAttribute('data-target');
-//         const targetContent = document.getElementById(targetContentId);
-//         if (targetContent) {
-//             targetContent.classList.add('active');
-//             targetContent.style.display = 'block'; // Показываем выбранную секцию
-//         }
-//     });
-// });
+
+
