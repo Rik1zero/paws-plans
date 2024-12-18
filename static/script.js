@@ -5,7 +5,7 @@ async function fetchData(endpoint, listElementId){
         const response = await fetch(endpoint);
         if (!response.ok)
             throw new Error('no network');
- 
+
         const data = await response.json();
         const listElement = document.getElementById(listElementId);
         data.forEach(item => {
@@ -18,15 +18,15 @@ async function fetchData(endpoint, listElementId){
         console.error('error fetching data', error)
     }
 }
- 
- 
- 
+
+
+
 async function fetchDaily(endpoint, listElementId){
 
 }
- 
- 
- 
+
+
+
 async function fetchTasks(endpoint, listElementId) {
     try {
         const response = await fetch(endpoint);
@@ -42,13 +42,14 @@ async function fetchTasks(endpoint, listElementId) {
         listElement.appendChild(taskCount);
 
         data.forEach(item => {
-            const className = item.is_done ? 'activities-task' : 'activities-task-negative';
+            const className = item.is_done ? 'activities-task-negative' : 'activities-task-';
+            const classTrue = item.is_done ? 'activities-checkBox-greenMark' : 'activities-checkBox-';
             const block = document.createElement('div');
             block.innerHTML = `
                 <div class="${className} roboto-bold" style="display: flex; justify-content: space-between; width: 100%;">
                     <div>${item.name}</div>
                     <div class="activities-check ml-auto">
-                        <div class="activities-checkBox-" data-checked="false"></div>
+                        <div class="${classTrue}" data-checked="false"></div>
                     </div>
                 </div>`;
             listElement.appendChild(block);
@@ -58,8 +59,8 @@ async function fetchTasks(endpoint, listElementId) {
     }
 }
 
- 
- 
+
+
 async function fetchHabities(endpoint, listElementId) {
     try {
         const response = await fetch(endpoint);
@@ -171,29 +172,29 @@ async function fetchUser(user_id, information_block) {
 
 
 fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
- 
+
 fetchTasks(`/users/${user_id}/tasks`, "tasks-list");
 console.log("js is working")
- 
- 
+
+
 document.addEventListener("DOMContentLoaded", () => {
    const information_block = document.getElementById('user-info');
    fetchUser(user_id, information_block);
    document.querySelectorAll('.menu .type-button, .menu .marker-button').forEach(item => {
        item.addEventListener('click', function() {
            console.log('Клик по элементу меню:', this.textContent.trim());
- 
+
            // Удаление класса 'active' у всех пунктов меню
            document.querySelectorAll('.menu div').forEach(item => item.classList.remove('active'));
- 
+
            // Добавление класса 'active' к выбранному пункту меню
            this.classList.add('active');
- 
+
            // Скрытие всех секций контента
            document.querySelectorAll('.content-section').forEach(section => {
                section.style.display = 'none';
            });
- 
+
            // Определение целевой секции контента и отображение
            let targetContentId;
            if (this.querySelector('.task-icon')) {
@@ -205,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
            } else if (this.querySelector('.settings-icon')) {
                targetContentId = 'settings-content';
            }
- 
+
            if (targetContentId) {
                const targetContent = document.getElementById(targetContentId);
                if (targetContent) {
@@ -217,5 +218,3 @@ document.addEventListener("DOMContentLoaded", () => {
        });
    });
 });
-
-

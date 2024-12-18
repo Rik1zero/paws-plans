@@ -152,6 +152,7 @@
     height:180px;
     width: 180px;
     background:url(../source/fon_project.png) no-repeat;
+
 }
 
 .inline div {
@@ -262,6 +263,17 @@ div.inline {
     justify-content: space-between;
     align-items: center;
     margin-top:5px;
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    align-items: center;
+    border-radius: 10px;
+    color: white;
+    padding: 10px;
+    display: flex;
+    margin-top:5px;
+    justify-content: space-between;
 }
 
 .activities-task-text{
@@ -433,8 +445,7 @@ div.inline {
 
 
 
-.activities-task,
-.activities-task-negative {
+.activities-task{
     width: 100%;
     padding: 10px;
     box-sizing: border-box;
