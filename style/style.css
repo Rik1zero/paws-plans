@@ -792,7 +792,7 @@ div.inline {
     margin-right:10px;
     padding:5px 10px 5px 10px;
 }
-.button-or:active{
+.button-or.active{
     border:4px #58D705 solid;
     border-radius:20px;
     padding:1px 6px 1px 6px;
@@ -804,7 +804,7 @@ div.inline {
     margin-left:10px;
     padding:5px 10px 5px 10px;
 }
-.button-or1:active{
+.button-or1.active{
     border:4px #F55306 solid;
     border-radius:20px;
     padding:1px 6px 1px 6px;

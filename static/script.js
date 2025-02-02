@@ -256,6 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const information_block = document.getElementById("user-info");
   fetchUser(user_id, information_block);
   let menuType = 1;
+
   document
     .querySelectorAll(".menu .type-button, .menu .marker-button")
     .forEach((item) => {
@@ -271,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let targetContentId;
         const addActivities = document.querySelector('.add-activities');
-      if (this.querySelector(".task-icon")) {
+        if (this.querySelector(".task-icon")) {
           targetContentId = "tasks-content";
           menuType = 1;
           addActivities.style.display = 'block';
@@ -288,7 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
           menuType = 4;
           addActivities.style.display = 'none';
         }
-        console.log('menu type',menuType);
+        console.log('menu type', menuType);
 
         if (targetContentId) {
           const targetContent = document.getElementById(targetContentId);
@@ -301,52 +302,125 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-      const templates = {
-        1:`<form class="pd-15">
-    <input placeholder="Введите текст" class="form-txt"type="text" name="name" id="name" required />
-            </form>
-            <div class="horizontal-center">
-                <button class="button-confirm">Подтвердить</button>
-                <button class="button-cancel">Отменить</button>
-            </div>`,
-        2:`<form class="pd-15">
-    <input placeholder="Введите текст" class="form-txt"type="text" name="name" id="name" required />
-            </form>
-            <div class="horizontal-center">
-                <button class="button-confirm">Подтвердить</button>
-                <button class="button-cancel">Отменить</button>
-            </div>`,
-        3:`<form class="pd-15">
-    <input placeholder="Введите текст" class="form-txt"type="text" name="name" id="name" required />
-            </form>
-            <div class="horizontal-center">
-                <button class="button-or">положительная</button>
-                <button class="button-or1">негативная</button>
-            </div>
-            <div class="horizontal-center">
-                <button class="button-confirm">Подтвердить</button>
-                <button class="button-cancel">Отменить</button>
-            </div>`
-      };
+  const templates = {
+    1: `<form class="pd-15">
+        <input placeholder="Введите текст" class="form-txt" type="text" name="name" id="name" required />
+      </form>
+      <div class="horizontal-center">
+        <button class="button-confirm">Подтвердить</button>
+        <button class="button-cancel">Отменить</button>
+      </div>`,
+    2: `<form class="pd-15">
+        <input placeholder="Введите текст" class="form-txt" type="text" name="name" id="name" required />
+      </form>
+      <div class="horizontal-center">
+        <button class="button-confirm">Подтвердить</button>
+        <button class="button-cancel">Отменить</button>
+      </div>`,
+    3: `<form class="pd-15">
+        <input placeholder="Введите текст" class="form-txt" type="text" name="name" id="name" required />
+      </form>
+      <div class="horizontal-center">
+        <button class="button-or">положительная</button>
+        <button class="button-or1">негативная</button>
+      </div>
+      <div class="horizontal-center">
+        <button class="button-confirm">Подтвердить</button>
+        <button class="button-cancel">Отменить</button>
+      </div>`
+  };
 
-       const createTask = document.querySelector('.create-task');
-      const addActivities = document.querySelector('.add-activities');
-      if (addActivities ){
-        addActivities.addEventListener('click',function(){
-            this.classList.toggle('rotated');
-            if (this.classList.contains('rotated')){
-                createTask.style.display = 'block';
-                if(templates[menuType]){
-                       createTask.innerHTML = templates[menuType];
-                       console.log('menu type',menuType);
-                }else{
-                       createTask.innerHTML = `error`;
-      }
-            }
+  const createTask = document.querySelector('.create-task');
+  const addActivities = document.querySelector('.add-activities');
 
-            else{
-                createTask.style.display = 'none';
+  if (addActivities) {
+    addActivities.addEventListener('click', function () {
+      this.classList.toggle('rotated');
+      if (this.classList.contains('rotated')) {
+        createTask.style.display = 'block';
+        if (templates[menuType]) {
+          createTask.innerHTML = templates[menuType];
+          console.log('menu type', menuType);
+          const positiveButton = createTask.querySelector('.button-or');
+          const negativeButton = createTask.querySelector('.button-or1');
+
+          function toggleActive() {
+            this.classList.add('active');
+            if (this === positiveButton) {
+              negativeButton.classList.remove('active');
+            } else {
+              positiveButton.classList.remove('active');
             }
-        });
+            console.log('type', this.textContent.trim());
+          }
+
+            if (positiveButton && negativeButton) {
+                    positiveButton.addEventListener('click', toggleActive);
+                    negativeButton.addEventListener('click', toggleActive);
+                    positiveButton.classList.add('active');
       }
+
+          async function addNewItem(name, type, isPositive) {
+            let container;
+            let className;
+            let checkClass;
+
+              if (type === 1) {
+                const task = {
+                  name: name,
+                  is_done: false
+                };
+
+                const container = document.getElementById('task-list');
+                const className = 'activities-task';
+                const checkClass = 'activities-checkBox-';
+
+                try {
+                  const response = await fetch(`/users/${user_id}/tasks`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(task)
+                  });
+
+                  if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Ошибка сети при сохранении: ${response.status} - ${errorText}`);
+                  }
+                    await fetchTasks(`/users/${user_id}/tasks`, "tasks-list");
+
+                } catch (error) {
+                  console.error('Ошибка при сохранении задачи', error);
+                }
+              }
+
+             else if (type === 2) {
+              container = document.getElementById('dailies-list');
+              className = 'activities-task';
+              checkClass = 'activities-checkBox-';
+            } else if (type === 3) {
+              container = document.getElementById('habits-list');
+              className = 'activities-task';
+              checkClass = 'activities-checkBox green';
+            }
+          }
+
+          const confirmButton = createTask.querySelector('.button-confirm');
+
+          confirmButton.addEventListener('click', function () {
+            const input = createTask.querySelector('input');
+            if (input && input.value.trim() !== '') {
+              addNewItem(input.value.trim(), menuType);
+              input.value = '';
+            }
+          });
+        } else {
+          createTask.innerHTML = `<div>Ошибка: шаблон не найден для значения ${menuType}.</div>`;
+        }
+      } else {
+        createTask.style.display = 'none';
+      }
+    });
+  }
 });

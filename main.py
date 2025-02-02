@@ -3,6 +3,9 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 
+from fastapi import FastAPI, HTTPException, Depends
+from sqlalchemy.orm import Session
+
 from model import *
 
 app = FastAPI()
@@ -143,6 +146,13 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     db.refresh(new_task)
     return new_task
 
+@app.post("/users/{user_id}/tasks/")
+def create_task_for_user(user_id: int, task: TaskCreate, db: Session = Depends(get_db)):
+    new_task = Task(**task.dict(), user_id=user_id)  # Добавляем user_id в данные задачи
+    db.add(new_task)
+    db.commit()
+    db.refresh(new_task)
+    return new_task
 
 @app.put("/tasks/{task_id}")
 def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
