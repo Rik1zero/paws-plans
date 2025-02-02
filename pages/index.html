@@ -14,7 +14,7 @@
 
   <div class="main inline">
     <div class="mainFrame vert ">
-
+         <div class="add-activities"></div>
       <div class="catBar green ">
         <div><img class="catPhoto" src="../source/котянапроект.png"></div>
 
@@ -22,9 +22,9 @@
 </div>
 
       </div>
-                <div id="tasks-content" class="content-section activitiesBar light-blue"><div id = "tasks-list"></div></div>
+                <div id="tasks-content" class="content-section activitiesBar light-blue"><div id = "tasks-list"></div>   </div>
         <div id="dailies-content" class="content-section activitiesBar light-blue" style="display: none;">Контент дейликов<br>Cooming soon</div>
-        <div id="habits-content" class="content-section activitiesBar light-blue" style="display: none;"><div id="habbities-list"></div></div>
+        <div id="habits-content" class="content-section activitiesBar light-blue" style="display: none;"><div id="habbities-list"></div> </div>
         <div id="settings-content" class="content-section activitiesBar light-blue" style="display: none;">Контент настроек<br>Cooming soon</div>
       <div class="activitiesBar light-blue" style="display:none">
 
@@ -117,8 +117,13 @@
                   <div class="activities-checkBox-"></div>
               </div>
           </div>
-          <div class="add-activities"></div>
-        <div class="create-task roboto-bold" style="display:none;">
+                        </div>      </div>
+
+
+        <div class="create-task roboto-bold " style="display:none;"> <!-- в этой строке display:none в случае чего-->
+            <div class = "create-task-item" data-value = 1>создать задачу</div>
+            <div class = "create-task-item" data-value = 2>создать дейлик</div>
+            <div class = "create-task-item" data-value = 3>создать привычку</div>
             <div class="horizontal-center roboto-regular">создать задачу</div>
             <form class="pd-15">
     <input placeholder="Введите текст" class="form-txt"type="text" name="name" id="name" required />
@@ -128,7 +133,7 @@
                 <button class="button-cancel">Отменить</button>
             </div>
 
-            <div class="horizontal-center roboto-regular">создать привычку</div>
+
             <form class="pd-15">
     <input placeholder="Введите текст" class="form-txt"type="text" name="name" id="name" required />
             </form>
@@ -152,13 +157,12 @@
                 <button class="button-confirm">Подтвердить</button>
                 <button class="button-cancel">Отменить</button>
             </div>
-
         </div>
-      </div>
 
-    </div>
+
+
               <div class="menu ">
-        <div class="type-button roboto-bold">
+        <div class="type-button roboto-bold active">
             <div class="task-icon"> </div>
             задачи
         </div>
@@ -175,7 +179,7 @@
               настройки
 
           </div>
-
+              </div>
       </div>
     </div>
   </body>
