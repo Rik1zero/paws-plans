@@ -368,7 +368,8 @@ document.addEventListener("DOMContentLoaded", () => {
               if (type === 1) {
                 const task = {
                   name: name,
-                  is_done: false
+                  is_done: false,
+                  user_id: user_id
                 };
 
                 const container = document.getElementById('task-list');
@@ -376,7 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const checkClass = 'activities-checkBox-';
 
                 try {
-                  const response = await fetch(`/users/${user_id}/tasks`, {
+                  const response = await fetch(`/users/${user_id}/tasks/`, {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json'

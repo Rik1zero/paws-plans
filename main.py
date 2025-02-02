@@ -148,12 +148,17 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
 
 @app.post("/users/{user_id}/tasks/")
 def create_task_for_user(user_id: int, task: TaskCreate, db: Session = Depends(get_db)):
-    new_task = Task(**task.dict(), user_id=user_id)  # Добавляем user_id в данные задачи
-    db.add(new_task)
-    db.commit()
-    db.refresh(new_task)
-    return new_task
-
+   try:
+       task_data = task.dict()
+       task_data['user_id'] = user_id
+       new_task = Task(**task_data)
+       db.add(new_task)
+       db.commit()
+       db.refresh(new_task)
+       return new_task
+   except Exception as e:
+       print(f"Error occurred: {e}")
+       raise HTTPException(status_code=500, detail="Internal Server Error")
 @app.put("/tasks/{task_id}")
 def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
     existing_task = db.query(Task).filter(Task.task_id == task_id).first()
