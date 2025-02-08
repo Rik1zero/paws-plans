@@ -139,7 +139,7 @@
 
 /*blocks*/
 
-#tasks-list, habbities-list{
+#task-list, habbities-list{
     display: flex;
     vertical-align: middle;
     flex-direction: column;
@@ -568,7 +568,7 @@ div.inline {
     position:absolute;
 }
 
-.line-tasks{
+.line-task{
     width:80%;
 
 

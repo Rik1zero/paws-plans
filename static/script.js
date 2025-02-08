@@ -248,7 +248,7 @@ function addCheckboxEventListeners(incompleteTasksContainer, completedTasksConta
 }
 
 fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
-fetchTasks(`/users/${user_id}/tasks`, "tasks-list");
+fetchTasks(`/users/${user_id}/tasks`, "task-list");
 
 document.addEventListener("DOMContentLoaded", () => {
     const information_block = document.getElementById("user-info");
@@ -271,7 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 let targetContentId;
                 const addActivities = document.querySelector('.add-activities');
                 if (this.querySelector(".task-icon")) {
-                    targetContentId = "tasks-content";
+                    targetContentId = "task-content";
                     menuType = 1;
                     addActivities.style.display = 'block';
                 } else if (this.querySelector(".dayleak-icon")) {
@@ -381,7 +381,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     const errorText = await response.text();
                                     throw new Error(`Ошибка сети при сохранении: ${response.status} - ${errorText}`);
                                 }
-                                await fetchTasks(`/users/${user_id}/tasks`, "tasks-list");
+                                await fetchTasks(`/users/${user_id}/tasks`, "task-list");
 
                             } catch (error) {
                                 console.error('Ошибка при сохранении задачи', error);
