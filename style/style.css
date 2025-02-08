@@ -178,6 +178,7 @@
 .main {
     /* Дополнительные стили для .main */
     width:100%;
+    overflow-y:auto;
 }
 
 body {
@@ -249,7 +250,7 @@ div.inline {
     min-height:80vh;
     overflow: hidden;
     padding: 10px 10px 10px 10px;
-    overflow:scroll;
+
 }
 
 .task-line{
@@ -441,7 +442,7 @@ div.inline {
 
 .menu {
     background: #567BFF; /* Цвет фона меню */
- /* Фиксированное положение внизу */
+    position: sticky;/* Фиксированное положение внизу */
     bottom: 0; /* Прикреплено к нижней части */
     width: 100%; /* Ширина 100% */
     display: flex; /* Используем flex для равномерного распределения элементов */
