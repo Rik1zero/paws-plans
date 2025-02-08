@@ -121,6 +121,21 @@ def update_habit(habbit_id: int, habit: HabitUpdate, db: Session = Depends(get_d
     return existing_habit
 
 
+@app.post("/users/{user_id}/habit/")
+def create_habit_for_user(user_id: int, habit: HabitCreate, db: Session = Depends(get_db)):
+   try:
+       habit = habit.dict()
+       habit['user_id'] = user_id
+       new_habit = Habit(**habit)
+       db.add(new_habit)
+       db.commit()
+       db.refresh(new_habit)
+       return new_habit
+   except Exception as e:
+       print(f"Error occurred: {e}")
+       raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
 @app.delete("/habbities/{habbit_id}")
 def delete_habit(habbit_id: int, db: Session = Depends(get_db)):
     habit = db.query(Habit).filter(Habit.habbit_id == habbit_id).first()

@@ -403,9 +403,32 @@ document.addEventListener("DOMContentLoaded", () => {
               className = 'activities-task';
               checkClass = 'activities-checkBox-';
             } else if (type === 3) {
-              container = document.getElementById('habits-list');
-              className = 'activities-task';
-              checkClass = 'activities-checkBox green';
+               const habit = {
+                  name: name,
+                  user_id: user_id,
+                  is_positive:is_positive
+                };
+
+                try {
+                  const response = await fetch(`/users/${user_id}/habit/`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(habit)
+                  });
+
+                  if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Ошибка сети при сохранении: ${response.status} - ${errorText}`);
+                  }
+                    await fetchTasks(`/users/${user_id}/habit`, "habbities-list");
+
+                } catch (error) {
+                  console.error('Ошибка при сохранении привычки', error);
+                }
+              }
+
             }
           }
 
