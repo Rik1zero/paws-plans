@@ -21,59 +21,67 @@ async function fetchData(endpoint, listElementId) {
 }
 
 async function fetchTasks(endpoint, listElementId) {
-  try {
-    const response = await fetch(endpoint);
-    if (!response.ok) throw new Error("no network");
+    try {
+        const response = await fetch(endpoint);
+        if (!response.ok) throw new Error("Network response was not ok");
 
-    const data = await response.json();
-    const listElement = document.getElementById(listElementId);
-    listElement.innerHTML = "";
+        // Получение данных
+        const data = await response.json();
 
-    // Обернем надписи в <div> и добавим класс для стиля
-    const taskCountTextDiv = document.createElement("div");
-    const completedLabelTextDiv = document.createElement("div");
-    taskCountTextDiv.className = "task-header";
-    completedLabelTextDiv.className = "task-header";
+        // Получение элемента списка задач
+        const listElement = document.getElementById(listElementId);
+        if (!listElement) {
+            console.error(`Element with id '${listElementId}' not found.`);
+            return;
+        }
+        listElement.innerHTML = "";
 
-    const incompleteTasks = data.filter((item) => !item.is_done);
-    taskCountTextDiv.textContent = `Актуальные задачи:`;
-    listElement.appendChild(taskCountTextDiv);
+        const taskCountTextDiv = document.createElement("div");
+        taskCountTextDiv.className = "task-header";
+        taskCountTextDiv.textContent = "Актуальные задачи:";
+        listElement.appendChild(taskCountTextDiv);
 
-    const incompleteTasksContainer = document.createElement("div");
-    incompleteTasksContainer.className = "task-container";
-    listElement.appendChild(incompleteTasksContainer);
+        const incompleteTasksContainer = document.createElement("div");
+        incompleteTasksContainer.className = "task-container";
+        listElement.appendChild(incompleteTasksContainer);
 
-    completedLabelTextDiv.textContent = "Выполненные задачи";
-    listElement.appendChild(completedLabelTextDiv);
+        const completedLabelTextDiv = document.createElement("div");
+        completedLabelTextDiv.className = "task-header";
+        completedLabelTextDiv.textContent = "Выполненные задачи";
+        listElement.appendChild(completedLabelTextDiv);
 
-    const completedTasksContainer = document.createElement("div");
-    completedTasksContainer.className = "task-container";
-    listElement.appendChild(completedTasksContainer);
+        const completedTasksContainer = document.createElement("div");
+        completedTasksContainer.className = "task-container";
+        listElement.appendChild(completedTasksContainer);
 
-    data.forEach((item) => {
-      const className = item.is_done ? "activities-task-negative" : "activities-task";
-      const checkClass = item.is_done ? "activities-checkBox-greenMark" : "activities-checkBox-";
-      const block = document.createElement("div");
-      block.className = "task-block";
-      block.innerHTML = `
+        data.forEach((item) => {
+            const className = item.is_done ? "activities-task-negative" : "activities-task";
+            const checkClass = item.is_done ? "activities-checkBox-greenMark" : "activities-checkBox-";
+
+            const block = document.createElement("div");
+            block.className = "task-block";
+            block.innerHTML = `
                 <div class="${className} roboto-bold" style="display: flex; justify-content: space-between; width: 100%;">
                     <div>${item.name}</div>
                     <div class="activities-check ml-auto">
                         <div class="${checkClass}" data-id="${item.id}" data-type="task" data-checked="${item.is_done}"></div>
                     </div>
-                </div>`;
-      if (item.is_done) {
-        completedTasksContainer.appendChild(block);
-      } else {
-        incompleteTasksContainer.appendChild(block);
-      }
-    });
+                </div>
+            `;
 
-    updateTaskAndLabelVisibility(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv);
-    addCheckboxEventListeners(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv);
-  } catch (error) {
-    console.error("error fetching data", error);
-  }
+            if (item.is_done) {
+                completedTasksContainer.appendChild(block);
+            } else {
+                incompleteTasksContainer.appendChild(block);
+            }
+        });
+
+        updateTaskAndLabelVisibility(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv);
+        addCheckboxEventListeners(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv);
+
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
 }
 
 async function fetchHabities(endpoint, listElementId) {
@@ -405,14 +413,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 } else if (type === 3) { // Habit
+                    console.log(name , isPositive,user_id);
                     const habit = {
                         name: name,
                         is_positive: isPositive,
-                        user_id: userId
+                        user_id: user_id
                     };
 
                     try {
-                        const response = await fetch(`/users/${userId}/habbities/`, {
+                        const response = await fetch(`/users/${user_id}/habit/`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -424,28 +433,62 @@ document.addEventListener("DOMContentLoaded", () => {
                             const errorText = await response.text();
                             throw new Error(`Network error while saving: ${response.status} - ${errorText}`);
                         }
-                        await fetchHabits(`/users/${userId}/habbites`, "habbities-list");
+                        fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
 
                     } catch (error) {
                         console.error('Error saving habit', error);
                     }
                 }
             }
-
-            confirmButton.addEventListener('click', function () {
-            const input = createTask.querySelector('input');
-            if (input && input.value.trim() !== '') {
-                const isPositive = positiveButton.classList.contains('active');
-                addNewItem(input.value.trim(), menuType, isPositive);
-                input.value = '';
+            const confirmButton = createTask.querySelector('.button-confirm');
+            if (confirmButton) {
+                confirmButton.addEventListener('click', function () {
+                    const input = createTask.querySelector('input');
+                    if (input && input.value.trim() !== '') {
+                        const isPositive = positiveButton.classList.contains('active');
+                        addNewItem(input.value.trim(), menuType, isPositive);
+                        input.value = '';
+                    }
+                });
+            } else {
+                console.error('Confirm button not found');
             }
-            });
         } else {
-          createTask.innerHTML = `<div>Ошибка: шаблон не найден для значения ${menuType}.</div>`;
+            createTask.innerHTML = `<div>Ошибка: шаблон не найден для значения ${menuType}.</div>`;
         }
-      } else {
+    } else {
         createTask.style.display = 'none';
-      }
+    }
     });
   }
+             const taskList = document.getElementById("task-list");
+
+       if (!taskList) {
+           console.error("Элемент с id 'task-list' не найден");
+           return;
+       }
+
+       taskList.addEventListener("change", async (event) => {
+           if (event.target.matches(".task-checkbox")) {
+               const taskId = event.target.dataset.taskId;
+               const isChecked = event.target.checked;
+
+               try {
+                   const response = await fetch(`/tasks/${taskId}`, {
+                       method: "PUT",
+                       headers: {
+                           "Content-Type": "application/json"
+                       },
+                       body: JSON.stringify({ is_done: isChecked })
+                   });
+
+                   if (!response.ok) {
+                       throw new Error("Ошибка при обновлении состояния задачи");
+                   }
+               } catch (error) {
+                   console.error("Ошибка:", error);
+               }
+           }
+       });
+
 });
