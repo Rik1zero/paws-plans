@@ -402,45 +402,44 @@ document.addEventListener("DOMContentLoaded", () => {
               container = document.getElementById('dailies-list');
               className = 'activities-task';
               checkClass = 'activities-checkBox-';
-            } else if (type === 3) {
-               const habit = {
-                  name: name,
-                  user_id: user_id,
-                  is_positive:is_positive
-                };
 
-                try {
-                  const response = await fetch(`/users/${user_id}/habit/`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(habit)
-                  });
 
-                  if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Ошибка сети при сохранении: ${response.status} - ${errorText}`);
-                  }
-                    await fetchTasks(`/users/${user_id}/habit`, "habbities-list");
+                } else if (type === 3) { // Habit
+                    const habit = {
+                        name: name,
+                        is_positive: isPositive,
+                        user_id: userId
+                    };
 
-                } catch (error) {
-                  console.error('Ошибка при сохранении привычки', error);
+                    try {
+                        const response = await fetch(`/users/${userId}/habbities/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(habit)
+                        });
+
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            throw new Error(`Network error while saving: ${response.status} - ${errorText}`);
+                        }
+                        await fetchHabits(`/users/${userId}/habbites`, "habbities-list");
+
+                    } catch (error) {
+                        console.error('Error saving habit', error);
+                    }
                 }
-              }
-
             }
-          }
 
-          const confirmButton = createTask.querySelector('.button-confirm');
-
-          confirmButton.addEventListener('click', function () {
+            confirmButton.addEventListener('click', function () {
             const input = createTask.querySelector('input');
             if (input && input.value.trim() !== '') {
-              addNewItem(input.value.trim(), menuType);
-              input.value = '';
+                const isPositive = positiveButton.classList.contains('active');
+                addNewItem(input.value.trim(), menuType, isPositive);
+                input.value = '';
             }
-          });
+            });
         } else {
           createTask.innerHTML = `<div>Ошибка: шаблон не найден для значения ${menuType}.</div>`;
         }
