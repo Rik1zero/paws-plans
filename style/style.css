@@ -7,6 +7,10 @@
     background:#F55306;
 }
 
+.colorBar{
+    background:#2bb3b3;
+}
+
 .font-dark-grey{
     color:#4E5662;
 }
@@ -140,7 +144,7 @@
     vertical-align: middle;
     flex-direction: column;
     position:relative;
-
+    overflow-y:auto;
 
 }
 
@@ -245,6 +249,7 @@ div.inline {
     min-height:80vh;
     overflow: hidden;
     padding: 10px 10px 10px 10px;
+    overflow:scroll;
 }
 
 .task-line{
@@ -257,6 +262,7 @@ div.inline {
 .task-container {
   display: flex;
   flex-direction: column;
+  pudding-bottom:5px;
 }
 
 .activities-task-negative {
@@ -435,7 +441,7 @@ div.inline {
 
 .menu {
     background: #567BFF; /* Цвет фона меню */
-    position: sticky; /* Фиксированное положение внизу */
+ /* Фиксированное положение внизу */
     bottom: 0; /* Прикреплено к нижней части */
     width: 100%; /* Ширина 100% */
     display: flex; /* Используем flex для равномерного распределения элементов */
@@ -515,10 +521,10 @@ div.inline {
 .add-activities{
     width:50px;
     height:50px;
-    border-radius:100%;
+    border-radius:100% !important;
     background:#F55306;
     right:10px;
-    bottom:45vh;
+    bottom:150px;
     position:absolute;
     display:block;
     z-index:20;
@@ -586,7 +592,7 @@ div.inline {
 .green-part{
     width: 100px;
     border-radius: 10px 0   0   10px;
-    padding: 4px;
+    padding: 4px 0 4px 0;
     color: white;
 }
 .display-block {
@@ -600,6 +606,7 @@ div.inline {
 
 .mood-bar{
     position:relative;
+    padding-top:5px;
 }
 
 .task-block {

@@ -173,7 +173,7 @@ async function updateUserInfo() {
             <div class="coinline mt-10">
                 <div class="coin-icon baseline"></div>
                 <div class="roboto-bold font-white baseline">${userData.money}</div>
-                <button class="button roboto-bold ml-auto">магазин</button>
+
             </div>
         </div>`;
     information_block.innerHTML = block;
@@ -303,7 +303,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   const templates = {
-    1: `<form class="pd-15">
+    1: `<div class="horizontal-center roboto-regular">создать задачу</div>
+        <form class="pd-15">
         <input placeholder="Введите текст" class="form-txt" type="text" name="name" id="name" required />
       </form>
       <div class="horizontal-center">
@@ -317,7 +318,8 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="button-confirm">Подтвердить</button>
         <button class="button-cancel">Отменить</button>
       </div>`,
-    3: `<form class="pd-15">
+    3: `<div class="horizontal-center roboto-regular">создать привычку</div>
+        <form class="pd-15">
         <input placeholder="Введите текст" class="form-txt" type="text" name="name" id="name" required />
       </form>
       <div class="horizontal-center">
