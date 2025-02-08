@@ -1,23 +1,24 @@
+
 const user_id = 1;
 let userData = { score: 0, mood: 0, money: 0 };
 
 console.log("hi");
 
 async function fetchData(endpoint, listElementId) {
-  try {
-    const response = await fetch(endpoint);
-    if (!response.ok) throw new Error("no network");
+    try {
+        const response = await fetch(endpoint);
+        if (!response.ok) throw new Error("no network");
 
-    const data = await response.json();
-    const listElement = document.getElementById(listElementId);
-    data.forEach((item) => {
-      const listItem = document.createElement("li");
-      listItem.textContent = JSON.stringify(item);
-      listElement.appendChild(listItem);
-    });
-  } catch (error) {
-    console.error("error fetching data", error);
-  }
+        const data = await response.json();
+        const listElement = document.getElementById(listElementId);
+        data.forEach((item) => {
+            const listItem = document.createElement("li");
+            listItem.textContent = JSON.stringify(item);
+            listElement.appendChild(listItem);
+        });
+    } catch (error) {
+        console.error("error fetching data", error);Ф
+    }
 }
 
 async function fetchTasks(endpoint, listElementId) {
@@ -25,10 +26,7 @@ async function fetchTasks(endpoint, listElementId) {
         const response = await fetch(endpoint);
         if (!response.ok) throw new Error("Network response was not ok");
 
-        // Получение данных
         const data = await response.json();
-
-        // Получение элемента списка задач
         const listElement = document.getElementById(listElementId);
         if (!listElement) {
             console.error(`Element with id '${listElementId}' not found.`);
@@ -85,22 +83,22 @@ async function fetchTasks(endpoint, listElementId) {
 }
 
 async function fetchHabities(endpoint, listElementId) {
-  try {
-    const response = await fetch(endpoint);
-    if (!response.ok) throw new Error("no network");
+    try {
+        const response = await fetch(endpoint);
+        if (!response.ok) throw new Error("no network");
 
-    const data = await response.json();
-    const listElement = document.getElementById(listElementId);
-    listElement.innerHTML = "";
+        const data = await response.json();
+        const listElement = document.getElementById(listElementId);
+        listElement.innerHTML = "";
 
-    const taskCount = document.createTextNode(`Количество привычек: ${data.length}`);
-    listElement.appendChild(taskCount);
+        const taskCount = document.createTextNode(`Количество привычек: ${data.length}`);
+        listElement.appendChild(taskCount);
 
-    data.forEach((item) => {
-      const block = document.createElement("div");
-      const checkClass = item.is_positive ? "activities-checkBox green" : "activities-checkBox-negative";
-      block.innerHTML = item.is_positive
-        ? `<div class="activities-task roboto-bold">
+        data.forEach((item) => {
+            const block = document.createElement("div");
+            const checkClass = item.is_positive ? "activities-checkBox green" : "activities-checkBox-negative";
+            block.innerHTML = item.is_positive
+                ? `<div class="activities-task roboto-bold">
                     <div>${item.name}</div>
                     <div class="activities-check ml-auto">
                         <div class="${checkClass}" data-id="${item.id}" data-type="habit" data-positive="true" data-times="${item.times}">
@@ -108,7 +106,7 @@ async function fetchHabities(endpoint, listElementId) {
                         </div>
                     </div>
                 </div>`
-        : `<div class="activities-task-negative roboto-bold">
+                : `<div class="activities-task-negative roboto-bold">
                     <div class="activities-check">
                         <div class="${checkClass}" data-id="${item.id}" data-type="habit" data-positive="false" data-times="${item.times}">
                             <div class="z-index-99 text-center mt-2 roboto-bold font-dark-grey">${item.times}</div>
@@ -116,379 +114,354 @@ async function fetchHabities(endpoint, listElementId) {
                     </div>
                     <div class="ml-auto">${item.name}</div>
                 </div>`;
-      listElement.appendChild(block);
-    });
+            listElement.appendChild(block);
+        });
 
-    addCheckboxEventListeners();
-  } catch (error) {
-    console.error("error fetching data", error);
-  }
+        addCheckboxEventListeners(); // Передайте необходимые параметры
+
+    } catch (error) {
+        console.error("error fetching data", error);
+    }
 }
 
-async function fetchUser(user_id, information_block) {
-  try {
-    const response = await fetch(`/users/${user_id}`);
-    if (!response.ok) throw new Error("Ошибка сети");
+async function fetchUser(user_id) {
+    try {
+        const response = await fetch(`/users/${user_id}`);
+        if (!response.ok) throw new Error("Ошибка сети");
 
-    const data = await response.json();
-    userData = {
-      score: data.score || 0,
-      mood: data.mood || 0,
-      money: data.money || 0,
-      level_id: data.level_id || 0
-    };
+        const data = await response.json();
+        userData = {
+            score: data.score || 0,
+            mood: data.mood || 0,
+            money: data.money || 0,
+            level_id: data.level_id || 0
+        };
 
-    updateUserInfo();
-  } catch (error) {
-    console.error("Ошибка при получении данных", error);
-  }
+        updateUserInfo();
+    } catch (error) {
+        console.error("Ошибка при получении данных", error);
+    }
 }
 
 async function updateUserInfo() {
-  try {
-    const levelResponse = await fetch(`/levels/${userData.level_id + 1}`);
-    if (!levelResponse.ok) throw new Error("Ошибка сети");
+    try {
+        const levelResponse = await fetch(`/levels/${userData.level_id + 1}`);
+        if (!levelResponse.ok) throw new Error("Ошибка сети");
 
-    const levelData = await levelResponse.json();
-    const level_top = levelData.level_top;
+        const levelData = await levelResponse.json();
+        const level_top = levelData.level_top;
 
-    const information_block = document.getElementById("user-info");
-    const block = `
-        <div class="informationBlock vert">
-            <div class="level">
-                <div class="roboto-bold font-white">Уровень ${
-                  userData.level_id || "неизвестно"
-                }</div>
-                <div class="level-bar">
-                    <div style="width:${(userData.score / level_top) * 100}%;" class="green-part light-green roboto-bold">${
-                      userData.score
-                    }</div>
-                </div>
-                <div class="inline">
-                    <div class="roboto-bold font-white">0</div>
-                    <div class="roboto-bold font-white ml-auto">${level_top}</div>
-                </div>
-            </div>
-            <div class="mood">
-                <div class="roboto-bold font-white">настроение:</div>
-                <div class="mood-bar">
-                    <div class="roboto-bold font-white">${userData.mood}%</div>
-                    <div class="level-mood-bar">
-                        <div style="width:${userData.mood}%;" class="procent-mood orange roboto-bold"></div>
+        const information_block = document.getElementById("user-info");
+        const block = `
+            <div class="informationBlock vert">
+                <div class="level">
+                    <div class="roboto-bold font-white">Уровень ${userData.level_id || "неизвестно"}</div>
+                    <div class="level-bar">
+                        <div style="width:${(userData.score / level_top) * 100}%;"
+                             class="green-part light-green roboto-bold">${userData.score}</div>
+                    </div>
+                    <div class="inline">
+                        <div class="roboto-bold font-white">0</div>
+                        <div class="roboto-bold font-white ml-auto">${level_top}</div>
                     </div>
                 </div>
-            </div>
-            <div class="coinline mt-10">
-                <div class="coin-icon baseline"></div>
-                <div class="roboto-bold font-white baseline">${userData.money}</div>
-
-            </div>
-        </div>`;
-    information_block.innerHTML = block;
-  } catch (error) {
-    console.error("Ошибка при обновлении информации пользователя", error);
-  }
+                <div class="mood">
+                    <div class="roboto-bold font-white">настроение:</div>
+                    <div class="mood-bar">
+                        <div class="roboto-bold font-white">${userData.mood}%</div>
+                        <div class="level-mood-bar">
+                            <div style="width:${userData.mood}%;"
+                                 class="procent-mood orange roboto-bold"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="coinline mt-10">
+                    <div class="coin-icon baseline"></div>
+                    <div class="roboto-bold font-white baseline">${userData.money}</div>
+                </div>
+            </div>`;
+        information_block.innerHTML = block;
+    } catch (error) {
+        console.error("Ошибка при обновлении информации пользователя", error);
+    }
 }
 
 function updateTaskAndLabelVisibility(incompleteContainer, completeContainer, taskCountTextDiv, completedLabelTextDiv) {
-  // Обновить видимость блока с количеством задач
-  taskCountTextDiv.style.display = incompleteContainer.children.length > 0 ? 'block' : 'none';
-
-  // Обновить видимость блока "Выполненные задачи"
-  completedLabelTextDiv.style.display = completeContainer.children.length > 0 ? 'block' : 'none';
+    taskCountTextDiv.style.display = incompleteContainer.children.length > 0 ? 'block' : 'none';
+    completedLabelTextDiv.style.display = completeContainer.children.length > 0 ? 'block' : 'none';
 }
 
 function addCheckboxEventListeners(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv) {
-  document
-    .querySelectorAll(
-      ".activities-checkBox-, .activities-checkBox-negative, .activities-checkBox.green"
-    )
-    .forEach((box) => {
-      box.addEventListener("click", function () {
-        const isChecked = this.dataset.checked === "true";
-        const type = this.dataset.type;
+    document
+        .querySelectorAll(
+            ".activities-checkBox-, .activities-checkBox-negative, .activities-checkBox.green"
+        )
+        .forEach((box) => {
+            box.addEventListener("click", function () {
+                const isChecked = this.dataset.checked === "true";
+                const type = this.dataset.type;
 
-        if (type === "task") {
-          if (!isChecked) {
-            this.dataset.checked = true;
-            userData.mood = Math.min(100, userData.mood + 10);
-            userData.money = Math.max(0, userData.money + 5);
-            userData.score += 15;
+                if (type === "task") {
+                    if (!isChecked) {
+                        this.dataset.checked = true;
+                        userData.mood = Math.min(100, userData.mood + 10);
+                        userData.money = Math.max(0, userData.money + 5);
+                        userData.score += 15;
 
-            const taskElement = this.parentElement.parentElement;
-            taskElement.classList.replace(
-              "activities-task",
-              "activities-task-negative"
-            );
-            this.classList.replace(
-              "activities-checkBox-",
-              "activities-checkBox-greenMark"
-            );
+                        const taskElement = this.parentElement.parentElement;
+                        taskElement.classList.replace(
+                            "activities-task",
+                            "activities-task-negative"
+                        );
+                        this.classList.replace(
+                            "activities-checkBox-",
+                            "activities-checkBox-greenMark"
+                        );
 
-            // Перемещение элемента
-            completedTasksContainer.appendChild(taskElement);
+                        completedTasksContainer.appendChild(taskElement);
 
-            // Обновление видимости и количества задач
-            updateTaskAndLabelVisibility(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv);
-          }
-        } else if (type === "habit") {
-          const isPositive = this.dataset.positive === "true";
-          let times = parseInt(this.dataset.times, 10);
-          this.dataset.times = ++times;
-          const textElement = this.querySelector(".z-index-99");
-          if (textElement) {
-            textElement.innerText = times;
-          }
+                        updateTaskAndLabelVisibility(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv);
+                    }
+                } else if (type === "habit") {
+                    const isPositive = this.dataset.positive === "true";
+                    let times = parseInt(this.dataset.times, 10);
+                    this.dataset.times = ++times;
+                    const textElement = this.querySelector(".z-index-99");
+                    if (textElement) {
+                        textElement.innerText = times;
+                    }
 
-          userData.score += 10;
+                    userData.score += 10;
 
-          if (isPositive) {
-            userData.mood = Math.min(100, userData.mood + 5);
-            userData.money = Math.max(0, userData.money + 3);
-          } else {
-            userData.mood = Math.max(0, userData.mood - 5);
-            userData.money = Math.max(0, userData.money - 3);
-          }
-        }
+                    if (isPositive) {
+                        userData.mood = Math.min(100, userData.mood + 5);
+                        userData.money = Math.max(0, userData.money + 3);
+                    } else {
+                        userData.mood = Math.max(0, userData.mood - 5);
+                        userData.money = Math.max(0, userData.money - 3);
+                    }
+                }
 
-        updateUserInfo();
-      });
-    });
+                updateUserInfo();
+            });
+        });
 }
-
 
 fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
 fetchTasks(`/users/${user_id}/tasks`, "tasks-list");
 
 document.addEventListener("DOMContentLoaded", () => {
-  const information_block = document.getElementById("user-info");
-  fetchUser(user_id, information_block);
-  let menuType = 1;
+    const information_block = document.getElementById("user-info");
+    fetchUser(user_id);
+    let menuType = 1;
 
-  document
-    .querySelectorAll(".menu .type-button, .menu .marker-button")
-    .forEach((item) => {
-      item.addEventListener("click", function () {
-        document
-          .querySelectorAll(".menu div")
-          .forEach((item) => item.classList.remove("active"));
-        this.classList.add("active");
+    document
+        .querySelectorAll(".menu .type-button, .menu .marker-button")
+        .forEach((item) => {
+            item.addEventListener("click", function () {
+                document
+                    .querySelectorAll(".menu div")
+                    .forEach((item) => item.classList.remove("active"));
+                this.classList.add("active");
 
-        document.querySelectorAll(".content-section").forEach((section) => {
-          section.style.display = "none";
+                document.querySelectorAll(".content-section").forEach((section) => {
+                    section.style.display = "none";
+                });
+
+                let targetContentId;
+                const addActivities = document.querySelector('.add-activities');
+                if (this.querySelector(".task-icon")) {
+                    targetContentId = "tasks-content";
+                    menuType = 1;
+                    addActivities.style.display = 'block';
+                } else if (this.querySelector(".dayleak-icon")) {
+                    targetContentId = "dailies-content";
+                    menuType = 2;
+                    addActivities.style.display = 'none';
+                } else if (this.querySelector(".habit-icon")) {
+                    targetContentId = "habits-content";
+                    menuType = 3;
+                    addActivities.style.display = 'block';
+                } else if (this.querySelector(".settings-icon")) {
+                    targetContentId = "settings-content";
+                    menuType = 4;
+                    addActivities.style.display = 'none';
+                }
+                console.log('menu type', menuType);
+
+                if (targetContentId) {
+                    const targetContent = document.getElementById(targetContentId);
+                    if (targetContent) {
+                        targetContent.style.display = "block";
+                    } else {
+                        console.error(`Целевая секция с ID ${targetContentId} не найдена`);
+                    }
+                }
+            });
         });
 
-        let targetContentId;
-        const addActivities = document.querySelector('.add-activities');
-        if (this.querySelector(".task-icon")) {
-          targetContentId = "tasks-content";
-          menuType = 1;
-          addActivities.style.display = 'block';
-        } else if (this.querySelector(".dayleak-icon")) {
-          targetContentId = "dailies-content";
-          menuType = 2;
-          addActivities.style.display = 'none';
-        } else if (this.querySelector(".habit-icon")) {
-          targetContentId = "habits-content";
-          menuType = 3;
-          addActivities.style.display = 'block';
-        } else if (this.querySelector(".settings-icon")) {
-          targetContentId = "settings-content";
-          menuType = 4;
-          addActivities.style.display = 'none';
-        }
-        console.log('menu type', menuType);
+    const templates = {
+        1: `<div class="horizontal-center roboto-regular">создать задачу</div>
+            <form class="pd-15">
+                <input placeholder="Введите текст" class="form-txt" type="text" name="name" id="name" required />
+            </form>
+            <div class="horizontal-center">
+                <button class="button-confirm">Подтвердить</button>
+                <button class="button-cancel">Отменить</button>
+            </div>`,
+        2: `<form class="pd-15">
+            <input placeholder="Введите текст" class="form-txt" type="text" name="name" id="name" required />
+            </form>
+            <div class="horizontal-center">
+                <button class="button-confirm">Подтвердить</button>
+                <button class="button-cancel">Отменить</button>
+            </div>`,
+        3: `<div class="horizontal-center roboto-regular">создать привычку</div>
+            <form class="pd-15">
+                <input placeholder="Введите текст" class="form-txt" type="text" name="name" id="name" required />
+            </form>
+            <div class="horizontal-center">
+                <button class="button-or">положительная</button>
+                <button class="button-or1">негативная</button>
+            </div>
+            <div class="horizontal-center">
+                <button class="button-confirm">Подтвердить</button>
+                <button class="button-cancel">Отменить</button>
+            </div>`
+    };
 
-        if (targetContentId) {
-          const targetContent = document.getElementById(targetContentId);
-          if (targetContent) {
-            targetContent.style.display = "block";
-          } else {
-            console.error(`Целевая секция с ID ${targetContentId} не найдена`);
-          }
-        }
-      });
-    });
+    const createTask = document.querySelector('.create-task');
+    const addActivities = document.querySelector('.add-activities');
 
-  const templates = {
-    1: `<div class="horizontal-center roboto-regular">создать задачу</div>
-        <form class="pd-15">
-        <input placeholder="Введите текст" class="form-txt" type="text" name="name" id="name" required />
-      </form>
-      <div class="horizontal-center">
-        <button class="button-confirm">Подтвердить</button>
-        <button class="button-cancel">Отменить</button>
-      </div>`,
-    2: `<form class="pd-15">
-        <input placeholder="Введите текст" class="form-txt" type="text" name="name" id="name" required />
-      </form>
-      <div class="horizontal-center">
-        <button class="button-confirm">Подтвердить</button>
-        <button class="button-cancel">Отменить</button>
-      </div>`,
-    3: `<div class="horizontal-center roboto-regular">создать привычку</div>
-        <form class="pd-15">
-        <input placeholder="Введите текст" class="form-txt" type="text" name="name" id="name" required />
-      </form>
-      <div class="horizontal-center">
-        <button class="button-or">положительная</button>
-        <button class="button-or1">негативная</button>
-      </div>
-      <div class="horizontal-center">
-        <button class="button-confirm">Подтвердить</button>
-        <button class="button-cancel">Отменить</button>
-      </div>`
-  };
+    if (addActivities) {
+        addActivities.addEventListener('click', function () {
+            this.classList.toggle('rotated');
+            if (this.classList.contains('rotated')) {
+                createTask.style.display = 'block';
+                if (templates[menuType]) {
+                    createTask.innerHTML = templates[menuType];
+                    console.log('menu type', menuType);
+                    const positiveButton = createTask.querySelector('.button-or');
+                    const negativeButton = createTask.querySelector('.button-or1');
 
-  const createTask = document.querySelector('.create-task');
-  const addActivities = document.querySelector('.add-activities');
-
-  if (addActivities) {
-    addActivities.addEventListener('click', function () {
-      this.classList.toggle('rotated');
-      if (this.classList.contains('rotated')) {
-        createTask.style.display = 'block';
-        if (templates[menuType]) {
-          createTask.innerHTML = templates[menuType];
-          console.log('menu type', menuType);
-          const positiveButton = createTask.querySelector('.button-or');
-          const negativeButton = createTask.querySelector('.button-or1');
-
-          function toggleActive() {
-            this.classList.add('active');
-            if (this === positiveButton) {
-              negativeButton.classList.remove('active');
-            } else {
-              positiveButton.classList.remove('active');
-            }
-            console.log('type', this.textContent.trim());
-          }
-
-            if (positiveButton && negativeButton) {
-                    positiveButton.addEventListener('click', toggleActive);
-                    negativeButton.addEventListener('click', toggleActive);
-                    positiveButton.classList.add('active');
-      }
-
-          async function addNewItem(name, type, isPositive) {
-            let container;
-            let className;
-            let checkClass;
-
-              if (type === 1) {
-                const task = {
-                  name: name,
-                  is_done: false,
-                  user_id: user_id
-                };
-
-                const container = document.getElementById('task-list');
-                const className = 'activities-task';
-                const checkClass = 'activities-checkBox-';
-
-                try {
-                  const response = await fetch(`/users/${user_id}/tasks/`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(task)
-                  });
-
-                  if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Ошибка сети при сохранении: ${response.status} - ${errorText}`);
-                  }
-                    await fetchTasks(`/users/${user_id}/tasks`, "tasks-list");
-
-                } catch (error) {
-                  console.error('Ошибка при сохранении задачи', error);
-                }
-              }
-
-             else if (type === 2) {
-              container = document.getElementById('dailies-list');
-              className = 'activities-task';
-              checkClass = 'activities-checkBox-';
-
-
-                } else if (type === 3) { // Habit
-                    console.log(name , isPositive,user_id);
-                    const habit = {
-                        name: name,
-                        is_positive: isPositive,
-                        user_id: user_id
-                    };
-
-                    try {
-                        const response = await fetch(`/users/${user_id}/habit/`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(habit)
-                        });
-
-                        if (!response.ok) {
-                            const errorText = await response.text();
-                            throw new Error(`Network error while saving: ${response.status} - ${errorText}`);
+                    function toggleActive() {
+                        this.classList.add('active');
+                        if (this === positiveButton) {
+                            negativeButton.classList.remove('active');
+                        } else {
+                            positiveButton.classList.remove('active');
                         }
-                        fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
-
-                    } catch (error) {
-                        console.error('Error saving habit', error);
+                        console.log('type', this.textContent.trim());
                     }
+
+                    if (positiveButton && negativeButton) {
+                        positiveButton.addEventListener('click', toggleActive);
+                        negativeButton.addEventListener('click', toggleActive);
+                        positiveButton.classList.add('active');
+                    }
+
+                    async function addNewItem(name, type, isPositive) {
+                        if (type === 1) {
+                            const task = {
+                                name: name,
+                                is_done: false,
+                                user_id: user_id
+                            };
+
+                            try {
+                                const response = await fetch(`/users/${user_id}/tasks/`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(task)
+                                });
+
+                                if (!response.ok) {
+                                    const errorText = await response.text();
+                                    throw new Error(`Ошибка сети при сохранении: ${response.status} - ${errorText}`);
+                                }
+                                await fetchTasks(`/users/${user_id}/tasks`, "tasks-list");
+
+                            } catch (error) {
+                                console.error('Ошибка при сохранении задачи', error);
+                            }
+                        } else if (type === 3) { // Habit
+                            const habit = {
+                                name: name,
+                                is_positive: isPositive,
+                                user_id: user_id
+                            };
+
+                            try {
+                                const response = await fetch(`/users/${user_id}/habit/`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(habit)
+                                });
+
+                                if (!response.ok) {
+                                    const errorText = await response.text();
+                                    throw new Error(`Network error while saving: ${response.status} - ${errorText}`);
+                                }
+                                fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
+
+                            } catch (error) {
+                                console.error('Error saving habit', error);
+                            }
+                        }
+                    }
+
+                    const confirmButton = createTask.querySelector('.button-confirm');
+                    if (confirmButton) {
+                        confirmButton.addEventListener('click', function () {
+                            const input = createTask.querySelector('input');
+                            if (input && input.value.trim() !== '') {
+                                const isPositive = positiveButton.classList.contains('active');
+                                addNewItem(input.value.trim(), menuType, isPositive);
+                                input.value = '';
+                            }
+                        });
+                    } else {
+                        console.error('Confirm button not found');
+                    }
+                } else {
+                    createTask.innerHTML = `<div>Ошибка: шаблон не найден для значения ${menuType}.</div>`;
                 }
-            }
-            const confirmButton = createTask.querySelector('.button-confirm');
-            if (confirmButton) {
-                confirmButton.addEventListener('click', function () {
-                    const input = createTask.querySelector('input');
-                    if (input && input.value.trim() !== '') {
-                        const isPositive = positiveButton.classList.contains('active');
-                        addNewItem(input.value.trim(), menuType, isPositive);
-                        input.value = '';
-                    }
-                });
             } else {
-                console.error('Confirm button not found');
+                createTask.style.display = 'none';
             }
-        } else {
-            createTask.innerHTML = `<div>Ошибка: шаблон не найден для значения ${menuType}.</div>`;
-        }
-    } else {
-        createTask.style.display = 'none';
+        });
     }
+
+    const taskList = document.getElementById("task-list");
+    if (!taskList) {
+        console.error("Элемент с id 'task-list' не найден");
+        return;
+    }
+
+    taskList.addEventListener("change", async (event) => {
+        if (event.target.matches(".task-checkbox")) {
+            const taskId = event.target.dataset.taskId;
+            const isChecked = event.target.checked;
+
+            try {
+                const response = await fetch(`/tasks/${taskId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ is_done: isChecked })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Ошибка при обновлении состояния задачи");
+                }
+            } catch (error) {
+                console.error("Ошибка:", error);
+            }
+        }
     });
-  }
-             const taskList = document.getElementById("task-list");
-
-       if (!taskList) {
-           console.error("Элемент с id 'task-list' не найден");
-           return;
-       }
-
-       taskList.addEventListener("change", async (event) => {
-           if (event.target.matches(".task-checkbox")) {
-               const taskId = event.target.dataset.taskId;
-               const isChecked = event.target.checked;
-
-               try {
-                   const response = await fetch(`/tasks/${taskId}`, {
-                       method: "PUT",
-                       headers: {
-                           "Content-Type": "application/json"
-                       },
-                       body: JSON.stringify({ is_done: isChecked })
-                   });
-
-                   if (!response.ok) {
-                       throw new Error("Ошибка при обновлении состояния задачи");
-                   }
-               } catch (error) {
-                   console.error("Ошибка:", error);
-               }
-           }
-       });
-
 });
