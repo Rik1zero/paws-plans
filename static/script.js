@@ -82,6 +82,75 @@ async function fetchTasks(endpoint, listElementId) {
     }
 }
 
+
+
+
+async function fetchDailies(endpoint, listElementId) {
+    try {
+        const response = await fetch(endpoint);
+        if (!response.ok) throw new Error("Network response was not ok");
+
+        const data = await response.json();
+        const listElement = document.getElementById(listElementId);
+        if (!listElement) {
+            console.error(`Element with id '${listElementId}' not found.`);
+            return;
+        }
+        listElement.innerHTML = "";
+
+        const taskCountTextDiv = document.createElement("div");
+        taskCountTextDiv.className = "task-header";
+        taskCountTextDiv.textContent = "Актуальные дейлики:";
+        listElement.appendChild(taskCountTextDiv);
+
+        const incompleteTasksContainer = document.createElement("div");
+        incompleteTasksContainer.className = "task-container";
+        listElement.appendChild(incompleteTasksContainer);
+
+        const completedLabelTextDiv = document.createElement("div");
+        completedLabelTextDiv.className = "task-header-";
+        completedLabelTextDiv.textContent = "Выполненные дейлики";
+        listElement.appendChild(completedLabelTextDiv);
+
+        const completedTasksContainer = document.createElement("div");
+        completedTasksContainer.className = "task-container";
+        listElement.appendChild(completedTasksContainer);
+
+        data.forEach((item) => {
+            const className = item.is_done ? "activities-task-negative" : "activities-task";
+            const checkClass = item.is_done ? "activities-checkBox-greenMark" : "activities-checkBox-";
+
+            const block = document.createElement("div");
+            block.className = "task-block";
+            block.innerHTML = `
+                <div class="${className} roboto-bold" style="display: flex; justify-content: space-between; width: 100%;">
+                    <div>${item.name}</div>
+                    <div class="activities-check ml-auto">
+                        <div class="${checkClass}" data-id="${item.id}" data-type="task" data-checked="${item.is_done}"></div>
+                    </div>
+                </div>
+            `;
+
+            if (item.is_done) {
+                completedTasksContainer.appendChild(block);
+            } else {
+                incompleteTasksContainer.appendChild(block);
+            }
+        });
+
+        updateTaskAndLabelVisibility(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv);
+        addCheckboxEventListeners(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv);
+
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+}
+
+
+
+
+
+
 async function fetchHabities(endpoint, listElementId) {
     try {
         const response = await fetch(endpoint);
@@ -249,6 +318,7 @@ function addCheckboxEventListeners(incompleteTasksContainer, completedTasksConta
 
 fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
 fetchTasks(`/users/${user_id}/tasks`, "task-list");
+fetchDailies('/users/${user_id}/dailies', "dailies-list");
 
 document.addEventListener("DOMContentLoaded", () => {
     const information_block = document.getElementById("user-info");
