@@ -442,26 +442,79 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    taskList.addEventListener("change", async (event) => {
-        if (event.target.matches(".task-checkbox")) {
-            const taskId = event.target.dataset.taskId;
-            const isChecked = event.target.checked;
+    function addCheckboxEventListeners(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv) {
+    // Селектор для всех чекбоксов
+    const checkboxes = document.querySelectorAll(".activities-checkBox-, .activities-checkBox-negative, .activities-checkBox.green");
 
-            try {
-                const response = await fetch(`/tasks/${taskId}`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ is_done: isChecked })
-                });
+    checkboxes.forEach((box) => {
+        box.addEventListener("click", function () {
+            const isChecked = this.dataset.checked === "true";
+            const type = this.dataset.type;
 
-                if (!response.ok) {
-                    throw new Error("Ошибка при обновлении состояния задачи");
+            if (type === "task") {
+                if (!isChecked) {
+                    this.dataset.checked = true;
+                    userData.mood = Math.min(100, userData.mood + 10);
+                    userData.money = Math.max(0, userData.money + 5);
+                    userData.score += 15;
+
+                    const taskElement = this.parentElement.parentElement;
+                    taskElement.classList.replace("activities-task", "activities-task-negative");
+                    this.classList.replace("activities-checkBox-", "activities-checkBox-greenMark");
+
+                    // Добавление задачи в выполненные
+                    completedTasksContainer.appendChild(taskElement);
+
+                    updateTaskAndLabelVisibility(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv);
                 }
-            } catch (error) {
-                console.error("Ошибка:", error);
+            } else if (type === "habit") {
+                const isPositive = this.dataset.positive === "true";
+                let times = parseInt(this.dataset.times, 10);
+                this.dataset.times = ++times;
+                const textElement = this.querySelector(".z-index-99");
+                if (textElement) {
+                    textElement.innerText = times;
+                }
+
+                userData.score += 10;
+
+                if (isPositive) {
+                    userData.mood = Math.min(100, userData.mood + 5);
+                    userData.money = Math.max(0, userData.money + 3);
+                } else {
+                    userData.mood = Math.max(0, userData.mood - 5);
+                    userData.money = Math.max(0, userData.money - 3);
+                }
             }
-        }
+
+            // Обновление информации о пользователе
+            updateUserInfo();
+        });
     });
+}
+taskList.addEventListener("change", async (event) => {
+    if (event.target.matches(".task-checkbox")) {
+        const taskId = event.target.dataset.taskId;
+        const isChecked = event.target.checked;
+
+        try {
+            const response = await fetch(`/tasks/${taskId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ is_done: isChecked })
+            });
+
+            if (!response.ok) {
+                throw new Error("Ошибка при обновлении состояния задачи");
+            }
+
+            // После успешного обновления статуса, обновляем список задач
+            await fetchTasks(`/users/${user_id}/tasks`, "task-list");
+        } catch (error) {
+            console.error("Ошибка:", error);
+        }
+    }
+});
 });
