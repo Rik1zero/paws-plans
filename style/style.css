@@ -155,7 +155,13 @@
 .catPhoto {
     height:180px;
     width: 180px;
-    background:url(../source/fon_project.png) no-repeat;
+    background:url(../source/fon_project1.png) no-repeat;
+}
+
+.catWindow{
+    width:186px;
+    height:186px;
+    background:url(../source/border_backg.png) no-repeat;
 
 }
 
@@ -291,6 +297,20 @@ div.inline {
 .activities-task-text{
     text-align:center;
 
+}
+
+.task-header{
+  font-family: "Roboto", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  color:white;
+}
+
+.task-header-{
+  font-family: "Roboto", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  color:#4E5662;
 }
 
 .activities-check-negative{

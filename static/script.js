@@ -44,7 +44,7 @@ async function fetchTasks(endpoint, listElementId) {
         listElement.appendChild(incompleteTasksContainer);
 
         const completedLabelTextDiv = document.createElement("div");
-        completedLabelTextDiv.className = "task-header";
+        completedLabelTextDiv.className = "task-header-";
         completedLabelTextDiv.textContent = "Выполненные задачи";
         listElement.appendChild(completedLabelTextDiv);
 
