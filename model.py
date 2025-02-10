@@ -1,18 +1,14 @@
 from typing import Optional
-
-from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
 from pydantic import BaseModel
-
-DATABASE_URL = "postgresql://postgres:12345@localhost:5432/paws-plans-db"
+from config import DATABASE_URL
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# Определение моделей SQLAlchemy
 class User(Base):
     __tablename__ = 'users'
     user_id = Column(Integer, primary_key=True, index=True)
@@ -24,12 +20,10 @@ class User(Base):
     money = Column(Integer, default=0)
     mood = Column(Integer, default=90)
 
-
 class Level(Base):
     __tablename__ = 'levels'
     levels_id = Column(Integer, primary_key=True, index=True)
     level_top = Column(Integer, nullable=False, default=0)
-
 
 class Habit(Base):
     __tablename__ = 'habbities'
@@ -39,14 +33,12 @@ class Habit(Base):
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     times = Column(Integer, default=0)
 
-
 class Task(Base):
     __tablename__ = 'tasks'
     task_id = Column(Integer, primary_key=True, index=True)
     name = Column(String(40), nullable=False)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     is_done = Column(Boolean, default=False)
-
 
 class Daily(Base):
     __tablename__ = 'dailies'
@@ -56,31 +48,27 @@ class Daily(Base):
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     is_done = Column(Boolean, default=False)
 
-
 class Repeatability(Base):
     __tablename__ = 'repeatabilities'
     repeatability_id = Column(Integer, primary_key=True, index=True)
     name = Column(String(40), nullable=False)
     time = Column(Integer, nullable=False)
-    last_repeat = Column(String, nullable=True)
-
+    last_repeat = Column(String, nullable=True)  # Изменено на String, если вы используете дату в виде строки
 
 class UserCreate(BaseModel):
     login: str
     email: str
-    pass_field: str
+    password: str  # Обновлено с pass на password
     level_id: int
-
 
 class UserUpdate(BaseModel):
     login: Optional[str]
     email: Optional[str]
-    pass_field: Optional[str]
+    password: Optional[str]  # Обновлено с pass на password
     level_id: Optional[int]
     score: Optional[int]
     money: Optional[int]
     mood: Optional[int]
-
 
 # Модели для таблицы habbities
 class HabitCreate(BaseModel):
@@ -89,13 +77,11 @@ class HabitCreate(BaseModel):
     user_id: int
     times: Optional[int] = 0
 
-
 class HabitUpdate(BaseModel):
     name: Optional[str]
     is_positive: Optional[bool]
     user_id: Optional[int]
     times: Optional[int]
-
 
 # Модели для таблицы tasks
 class TaskCreate(BaseModel):
@@ -103,12 +89,10 @@ class TaskCreate(BaseModel):
     user_id: int
     is_done: Optional[bool] = False
 
-
 class TaskUpdate(BaseModel):
     name: Optional[str]
     user_id: Optional[int]
     is_done: Optional[bool]
-
 
 # Модели для таблицы dailies
 class DailyCreate(BaseModel):
@@ -117,11 +101,24 @@ class DailyCreate(BaseModel):
     user_id: int
     is_done: Optional[bool] = False
 
-
 class DailyUpdate(BaseModel):
     name: Optional[str]
     repeatability_id: Optional[int]
     user_id: Optional[int]
     is_done: Optional[bool]
 
+class ChangeLog(Base):
+    __tablename__ = 'change_logs'
+    id = Column(Integer, primary_key=True, index=True)
+    table_name = Column(String, nullable=False)
+    record_id = Column(Integer, nullable=False)
+    operation = Column(String, nullable=False)  # 'CREATE', 'UPDATE', 'DELETE'
+    timestamp = Column(String, nullable=False)  # Можно использовать DateTime для хранения даты
+    user_id = Column(Integer, nullable=False)  # ID пользователя, который инициировал изменение
 
+class ChangeLogCreate(BaseModel):
+    table_name: str
+    record_id: int
+    operation: str
+    timestamp: str
+    user_id: int

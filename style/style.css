@@ -496,7 +496,7 @@ div.inline {
 
 .menu div.active {
     background: #ffd059 40%;
-    fill: #ffd059 40%;
+    fill: #ffd059 ;
     -webkit-filter: invert(100%);
     filter: invert(100%);
     font-weight: bold;
@@ -536,7 +536,7 @@ div.inline {
     display:flex;
     border-radius:15px;
     background: #002FA6 40%;
-    fill: #002FA6 40%;
+    fill: #002FA6 ;
     justify-content:center;
 
 }
