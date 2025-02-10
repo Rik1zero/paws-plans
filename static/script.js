@@ -126,7 +126,7 @@ async function fetchDailies(endpoint, listElementId) {
                 <div class="${className} roboto-bold" style="display: flex; justify-content: space-between; width: 100%;">
                     <div>${item.name}</div>
                     <div class="activities-check ml-auto">
-                        <div class="${checkClass}" data-id="${item.id}" data-type="task" data-checked="${item.is_done}"></div>
+                        <div class="${checkClass}" data-id="${item.id}" data-type="dailies" data-repeatability_id = "${item.repeatability_id}" data-checked="${item.is_done}"></div>
                     </div>
                 </div>
             `;
@@ -160,8 +160,11 @@ async function fetchHabities(endpoint, listElementId) {
         const listElement = document.getElementById(listElementId);
         listElement.innerHTML = "";
 
-        const taskCount = document.createTextNode(`Количество привычек: ${data.length}`);
-        listElement.appendChild(taskCount);
+
+        const completedLabelTextDiv = document.createElement("div");
+        completedLabelTextDiv.className = "task-header";
+        completedLabelTextDiv.textContent = `Количество привычек: ${data.length}`;
+        listElement.appendChild(completedLabelTextDiv);
 
         data.forEach((item) => {
             const block = document.createElement("div");
@@ -221,6 +224,7 @@ async function updateUserInfo() {
         const level_top = levelData.level_top;
 
         const information_block = document.getElementById("user-info");
+        let lvl_mood = Math.round((userData.mood - 1) / 25);
         const block = `
             <div class="informationBlock vert">
                 <div class="level">
@@ -240,7 +244,7 @@ async function updateUserInfo() {
                         <div class="roboto-bold font-white">${userData.mood}%</div>
                         <div class="level-mood-bar">
                             <div style="width:${userData.mood}%;"
-                                 class="procent-mood orange roboto-bold"></div>
+                                 class="procent-mood level-mood-${lvl_mood} roboto-bold"></div>
                         </div>
                     </div>
                 </div>
@@ -273,10 +277,24 @@ function addCheckboxEventListeners(incompleteTasksContainer, completedTasksConta
                 if (type === "task") {
                     if (!isChecked) {
                         this.dataset.checked = true;
-                        userData.mood = Math.min(100, userData.mood + 10);
                         userData.money = Math.max(0, userData.money + 5);
-                        userData.score += 15;
 
+                        if(userData.mood < 25){
+                        userData.mood = Math.min(100, userData.mood + 15);
+                        userData.score += 10;
+                        }
+                        else if(userData.mood < 50 && userData.mood >= 25){
+                        userData.mood = Math.min(100, userData.mood + 12);
+                        userData.score += 12;
+                        }
+                        else if(userData.mood < 75 && userData.mood >= 50){
+                        userData.mood = Math.min(100, userData.mood + 10);
+                        userData.score += 15;
+                        }
+                        else if(userData.mood >= 75){
+                        userData.mood = Math.min(100, userData.mood + 5);
+                        userData.score += 15;
+                        }
                         const taskElement = this.parentElement.parentElement;
                         taskElement.classList.replace(
                             "activities-task",
@@ -300,14 +318,15 @@ function addCheckboxEventListeners(incompleteTasksContainer, completedTasksConta
                         textElement.innerText = times;
                     }
 
-                    userData.score += 10;
 
                     if (isPositive) {
                         userData.mood = Math.min(100, userData.mood + 5);
                         userData.money = Math.max(0, userData.money + 3);
+                        userData.score += 10;
                     } else {
                         userData.mood = Math.max(0, userData.mood - 5);
                         userData.money = Math.max(0, userData.money - 3);
+                        userData.score += 2;
                     }
                 }
 
@@ -318,7 +337,7 @@ function addCheckboxEventListeners(incompleteTasksContainer, completedTasksConta
 
 fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
 fetchTasks(`/users/${user_id}/tasks`, "task-list");
-fetchDailies('/users/${user_id}/dailies', "dailies-list");
+fetchDailies(`/users/${user_id}/dailies`, "dailies-list");
 
 document.addEventListener("DOMContentLoaded", () => {
     const information_block = document.getElementById("user-info");

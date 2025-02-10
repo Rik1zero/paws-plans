@@ -652,6 +652,23 @@ div.inline {
     border-radius: 10px 0 0 10px;
 }
 
+.level-mood-0{
+    background:#4a0000;
+}
+
+.level-mood-1{
+    background:#ff1919;
+}
+.level-mood-2{
+    background:#ff7d19;
+}
+.level-mood-3{
+    background:#f4ff19;
+}
+.level-mood-4{
+    background:#34ff19;
+}
+
 .coin-icon{
     background:url(../source/coin.svg) no-repeat;
     width:20px;
