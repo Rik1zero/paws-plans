@@ -7,6 +7,7 @@ import uvicorn
 from model import *
 
 app = FastAPI()
+app.mount("/source", StaticFiles(directory="source"), name="source")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 user_id = 1  # Здесь можно использовать реальный user_id
 
@@ -238,7 +239,7 @@ def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
         record_id=task_id,
         operation='UPDATE',
         timestamp=str(datetime.utcnow()),
-        user_id=user_id  # Замените на реальный user_id
+        user_id=user_id
     )
     log_change(db, change_log)
 
@@ -258,11 +259,38 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
         record_id=task_id,
         operation='DELETE',
         timestamp=str(datetime.utcnow()),
-        user_id=user_id  # Замените на реальный user_id
+        user_id=user_id
     )
     log_change(db, change_log)
 
     return {"detail": "Task deleted successfully"}
+
+@app.post("/users/{user_id}/tasks/")
+def create_task_for_user(user_id: int, task: TaskCreate, db: Session = Depends(get_db)):
+   try:
+       task_data = task.dict()
+       task_data['user_id'] = user_id
+       new_task = Task(**task_data)
+       db.add(new_task)
+       db.commit()
+       db.refresh(new_task)
+       return new_task
+   except Exception as e:
+       print(f"Error occurred: {e}")
+       raise HTTPException(status_code=500, detail="Internal Server Error")
+@app.put("/tasks/{task_id}")
+def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
+    existing_task = db.query(Task).filter(Task.task_id == task_id).first()
+    if existing_task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    for key, value in task.dict(exclude_unset=True).items():
+        setattr(existing_task, key, value)
+
+    db.commit()
+    db.refresh(existing_task)
+    return existing_task
+
 
 # Эндпоинты для работы с ежедневными задачами
 @app.get("/dailies/")
@@ -287,6 +315,27 @@ def create_daily(daily: DailyCreate, db: Session = Depends(get_db)):
 
     return new_daily
 
+@app.get("/users/{user_id}/tasks")
+def read_user_tasks(user_id: int, db: Session = Depends(get_db)):
+    tasks = db.query(Task).filter(Task.user_id == user_id).all()
+    if not tasks:
+        raise HTTPException(status_code=404, detail="tasks not found")
+    return tasks
+
+@app.get("/users/{user_id}/habbites")
+def read_user_habbites(user_id: int, db: Session = Depends(get_db)):
+    habbites = db.query(Habit).filter(Habit.user_id == user_id).all()
+    if not habbites:
+        raise HTTPException(status_code=404, detail="habbites not found")
+    return habbites
+
+@app.get("/users/{user_id}/dailies")
+def read_user_dailies(user_id: int, db: Session = Depends(get_db)):
+    dailies = db.query(Daily).filter(Daily.user_id == user_id).all()
+    if not dailies:
+        raise HTTPException(status_code=404, detail="dailies not found")
+    return dailies
+
 @app.put("/dailies/{daily_id}")
 def update_daily(daily_id: int, daily: DailyUpdate, db: Session = Depends(get_db)):
     existing_daily = db.query(Daily).filter(Daily.daily_id == daily_id).first()
@@ -310,6 +359,16 @@ def update_daily(daily_id: int, daily: DailyUpdate, db: Session = Depends(get_db
 
     return existing_daily
 
+@app.post("/users/{user_id}/tasks/")
+def create_task_for_user(user_id: int, task: TaskCreate, db: Session = Depends(get_db)):
+   task_data = task.dict()
+   task_data['user_id'] = user_id
+   new_task = Task(**task_data)
+   db.add(new_task)
+   db.commit()
+   db.refresh(new_task)
+   return new_task
+
 @app.delete("/dailies/{daily_id}")
 def delete_daily(daily_id: int, db: Session = Depends(get_db)):
     daily = db.query(Daily).filter(Daily.daily_id == daily_id).first()
@@ -330,7 +389,6 @@ def delete_daily(daily_id: int, db: Session = Depends(get_db)):
 
     return {"detail": "Daily task deleted successfully"}
 
-# Эндпоинты для работы с повторяемостью
 @app.get("/repeatabilities/")
 def read_repeatabilities(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return db.query(Repeatability).offset(skip).limit(limit).all()
@@ -355,7 +413,6 @@ def delete_repeatability(repeatability_id: int, db: Session = Depends(get_db)):
 
     return {"detail": "Repeatability deleted successfully"}
 
-# Маршрут для обслуживания index.html
 @app.get("/", response_class=HTMLResponse)
 async def read_index():
     with open("pages/index.html", "r", encoding="utf-8") as file:

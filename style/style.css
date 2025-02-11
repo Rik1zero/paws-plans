@@ -148,8 +148,12 @@
 
 }
 
-.fonCat{
-
+.fonPL{
+    background: url('../source/mainFrame_backg.png') no-repeat;
+    backdrop-filter: blur(0px);
+    z-index: -7;
+    width:100%;
+    height:100%;
 }
 
 .catPhoto {
@@ -188,7 +192,6 @@
 }
 
 body {
-    background: #A1BFDC;
     margin: 0 auto; /* Центрируем блоки */
     width: 100%; /* Задаем ширину 100%, чтобы сделать ее резиновой */
     max-width: 700px; /* Устанавливаем максимальную ширину */
@@ -199,10 +202,14 @@ body {
 
 html{height:100%;}
 
+.backg{
+    background: url('../source/mainFrame_backg.png') no-repeat;
+    filter: blur(4px);
+}
+
 .mainFrame {
     display: flex;
     flex-direction: column;
-    background: #A1BFDC;
     vertical-align: central;
     position:relative;
     height:100%;
@@ -310,7 +317,7 @@ div.inline {
   font-family: "Roboto", sans-serif;
   font-weight: 700;
   font-style: normal;
-  color:#4E5662;
+  color:#030303;
 }
 
 .activities-check-negative{
@@ -496,7 +503,7 @@ div.inline {
 
 .menu div.active {
     background: #ffd059 40%;
-    fill: #ffd059 ;
+    fill: #ffd059 40%;
     -webkit-filter: invert(100%);
     filter: invert(100%);
     font-weight: bold;
@@ -536,12 +543,13 @@ div.inline {
     display:flex;
     border-radius:15px;
     background: #002FA6 40%;
-    fill: #002FA6 ;
+    fill: #002FA6 40%;
     justify-content:center;
 
 }
 
 .add-activities{
+    z-index:101 !important;
     width:50px;
     height:50px;
     border-radius:100% !important;
@@ -550,7 +558,6 @@ div.inline {
     bottom:150px;
     position:absolute;
     display:block;
-    z-index:20;
     transition:transform 0.3s ease-in-out;
 
 }
