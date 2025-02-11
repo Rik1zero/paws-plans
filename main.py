@@ -359,6 +359,20 @@ def update_daily(daily_id: int, daily: DailyUpdate, db: Session = Depends(get_db
 
     return existing_daily
 
+@app.patch("/tasks/{task_id}/toggle")
+def toggle_task_status(task_id: int, db: Session = Depends(get_db)):
+    task = db.query(Task).filter(Task.task_id == task_id).first()  # Используйте правильное поле для идентификатора
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    # Переключаем значение is_done
+    task.is_done = not task.is_done
+
+    db.commit()
+    db.refresh(task)
+
+    return {"task_id": task.task_id, "is_done": task.is_done}
+
 @app.post("/users/{user_id}/tasks/")
 def create_task_for_user(user_id: int, task: TaskCreate, db: Session = Depends(get_db)):
    task_data = task.dict()

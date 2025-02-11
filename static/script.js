@@ -9,13 +9,15 @@ async function fetchData(endpoint, listElementId) {
         const response = await fetch(endpoint);
         if (!response.ok) throw new Error("no network");
 
-        const data = await response.json();
+        let data = await response.json();
+        data.reverse();
         const listElement = document.getElementById(listElementId);
         data.forEach((item) => {
             const listItem = document.createElement("li");
             listItem.textContent = JSON.stringify(item);
             listElement.appendChild(listItem);
         });
+
     } catch (error) {
         console.error("error fetching data", error);Ф
     }
@@ -27,6 +29,7 @@ async function fetchTasks(endpoint, listElementId) {
         if (!response.ok) throw new Error("Network response was not ok");
 
         const data = await response.json();
+
         const listElement = document.getElementById(listElementId);
         if (!listElement) {
             console.error(`Element with id '${listElementId}' not found.`);
@@ -53,18 +56,25 @@ async function fetchTasks(endpoint, listElementId) {
         listElement.appendChild(completedTasksContainer);
 
         data.forEach((item) => {
+            // Используем правильное имя поля для идентификатора
+            const taskId = item.id || item.task_id;  // Попробуйте оба варианта
+            if (!taskId) {
+                console.error("Task ID is missing for item:", item);
+                return;
+            }
+
             const className = item.is_done ? "activities-task-negative" : "activities-task";
             const checkClass = item.is_done ? "activities-checkBox-greenMark" : "activities-checkBox-";
 
             const block = document.createElement("div");
             block.className = "task-block";
             block.innerHTML = `
-                <div class="${className} roboto-bold" style="display: flex; justify-content: space-between; width: 100%;">
-                    <div>${item.name}</div>
-                    <div class="activities-check ml-auto">
-                        <div class="${checkClass}" data-id="${item.id}" data-type="task" data-checked="${item.is_done}"></div>
-                    </div>
+            <div class="${className} roboto-bold" style="display: flex; justify-content: space-between; width: 100%;">
+                <div>${item.name}</div>
+                <div class="activities-check ml-auto">
+                    <div class="${checkClass}" data-id="${taskId}" data-type="task" data-checked="${item.is_done}"></div>
                 </div>
+            </div>
             `;
 
             if (item.is_done) {
@@ -267,35 +277,37 @@ function updateTaskAndLabelVisibility(incompleteContainer, completeContainer, ta
 function addCheckboxEventListeners(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv) {
     document
         .querySelectorAll(
-            ".activities-checkBox-, .activities-checkBox-negative, .activities-checkBox.green"
+            ".activities-checkBox-, .activities-checkBox-negative, .activities-checkBox-greenMark"
         )
         .forEach((box) => {
-            box.addEventListener("click", function () {
+            box.addEventListener("click", async function () {
                 const isChecked = this.dataset.checked === "true";
                 const type = this.dataset.type;
 
                 if (type === "task") {
-                    if (!isChecked) {
-                        this.dataset.checked = true;
+                    // Переключение состояния задачи
+                    const newCheckedState = !isChecked;
+                    this.dataset.checked = newCheckedState;
+
+                    const taskElement = this.parentElement.parentElement;
+                    if (newCheckedState) {
+                        // Пометить как выполненную
                         userData.money = Math.max(0, userData.money + 5);
 
-                        if(userData.mood < 25){
-                        userData.mood = Math.min(100, userData.mood + 15);
-                        userData.score += 10;
+                        if (userData.mood < 25) {
+                            userData.mood = Math.min(100, userData.mood + 15);
+                            userData.score += 10;
+                        } else if (userData.mood < 50 && userData.mood >= 25) {
+                            userData.mood = Math.min(100, userData.mood + 12);
+                            userData.score += 12;
+                        } else if (userData.mood < 75 && userData.mood >= 50) {
+                            userData.mood = Math.min(100, userData.mood + 10);
+                            userData.score += 15;
+                        } else if (userData.mood >= 75) {
+                            userData.mood = Math.min(100, userData.mood + 5);
+                            userData.score += 15;
                         }
-                        else if(userData.mood < 50 && userData.mood >= 25){
-                        userData.mood = Math.min(100, userData.mood + 12);
-                        userData.score += 12;
-                        }
-                        else if(userData.mood < 75 && userData.mood >= 50){
-                        userData.mood = Math.min(100, userData.mood + 10);
-                        userData.score += 15;
-                        }
-                        else if(userData.mood >= 75){
-                        userData.mood = Math.min(100, userData.mood + 5);
-                        userData.score += 15;
-                        }
-                        const taskElement = this.parentElement.parentElement;
+
                         taskElement.classList.replace(
                             "activities-task",
                             "activities-task-negative"
@@ -306,9 +318,39 @@ function addCheckboxEventListeners(incompleteTasksContainer, completedTasksConta
                         );
 
                         completedTasksContainer.appendChild(taskElement);
+                    } else {
+                        // Пометить как невыполненную
+                        userData.money = Math.max(0, userData.money - 5);
 
-                        updateTaskAndLabelVisibility(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv);
+                        taskElement.classList.replace(
+                            "activities-task-negative",
+                            "activities-task"
+                        );
+                        this.classList.replace(
+                            "activities-checkBox-greenMark",
+                            "activities-checkBox-"
+                        );
+
+                        incompleteTasksContainer.appendChild(taskElement);
                     }
+
+                    // Обновление задачи на сервере
+                    try {
+
+                        const taskId = this.dataset.id;
+                        console.log(`Updating task with ID: ${taskId}`);
+                        await fetch(`/tasks/${taskId}/toggle`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ is_done: newCheckedState })
+                        });
+                    } catch (error) {
+                        console.error('Error updating task state', error);
+                    }
+
+                    updateTaskAndLabelVisibility(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv);
                 } else if (type === "habit") {
                     const isPositive = this.dataset.positive === "true";
                     let times = parseInt(this.dataset.times, 10);
@@ -317,7 +359,6 @@ function addCheckboxEventListeners(incompleteTasksContainer, completedTasksConta
                     if (textElement) {
                         textElement.innerText = times;
                     }
-
 
                     if (isPositive) {
                         userData.mood = Math.min(100, userData.mood + 5);
@@ -334,60 +375,60 @@ function addCheckboxEventListeners(incompleteTasksContainer, completedTasksConta
             });
         });
 }
-
 fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
 fetchTasks(`/users/${user_id}/tasks`, "task-list");
 fetchDailies(`/users/${user_id}/dailies`, "dailies-list");
 
 document.addEventListener("DOMContentLoaded", () => {
+    const user_id = 1;
+    let userData = { score: 0, mood: 0, money: 0 };
+
+    fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
+    fetchTasks(`/users/${user_id}/tasks`, "task-list");
+
     const information_block = document.getElementById("user-info");
-    fetchUser(user_id);
+    fetchUser(user_id, information_block);
     let menuType = 1;
 
-    document
-        .querySelectorAll(".menu .type-button, .menu .marker-button")
-        .forEach((item) => {
-            item.addEventListener("click", function () {
-                document
-                    .querySelectorAll(".menu div")
-                    .forEach((item) => item.classList.remove("active"));
-                this.classList.add("active");
+    document.querySelectorAll(".menu .type-button, .menu .marker-button").forEach((item) => {
+        item.addEventListener("click", function () {
+            document.querySelectorAll(".menu div").forEach((item) => item.classList.remove("active"));
+            this.classList.add("active");
 
-                document.querySelectorAll(".content-section").forEach((section) => {
-                    section.style.display = "none";
-                });
-
-                let targetContentId;
-                const addActivities = document.querySelector('.add-activities');
-                if (this.querySelector(".task-icon")) {
-                    targetContentId = "task-content";
-                    menuType = 1;
-                    addActivities.style.display = 'block';
-                } else if (this.querySelector(".dayleak-icon")) {
-                    targetContentId = "dailies-content";
-                    menuType = 2;
-                    addActivities.style.display = 'none';
-                } else if (this.querySelector(".habit-icon")) {
-                    targetContentId = "habits-content";
-                    menuType = 3;
-                    addActivities.style.display = 'block';
-                } else if (this.querySelector(".settings-icon")) {
-                    targetContentId = "settings-content";
-                    menuType = 4;
-                    addActivities.style.display = 'none';
-                }
-                console.log('menu type', menuType);
-
-                if (targetContentId) {
-                    const targetContent = document.getElementById(targetContentId);
-                    if (targetContent) {
-                        targetContent.style.display = "block";
-                    } else {
-                        console.error(`Целевая секция с ID ${targetContentId} не найдена`);
-                    }
-                }
+            document.querySelectorAll(".content-section").forEach((section) => {
+                section.style.display = "none";
             });
+
+            let targetContentId;
+            const addActivities = document.querySelector('.add-activities');
+            if (this.querySelector(".task-icon")) {
+                targetContentId = "tasks-content";
+                menuType = 1;
+                addActivities.style.display = 'block';
+            } else if (this.querySelector(".dayleak-icon")) {
+                targetContentId = "dailies-content";
+                menuType = 2;
+                addActivities.style.display = 'none';
+            } else if (this.querySelector(".habit-icon")) {
+                targetContentId = "habits-content";
+                menuType = 3;
+                addActivities.style.display = 'block';
+            } else if (this.querySelector(".settings-icon")) {
+                targetContentId = "settings-content";
+                menuType = 4;
+                addActivities.style.display = 'none';
+            }
+
+            if (targetContentId) {
+                const targetContent = document.getElementById(targetContentId);
+                if (targetContent) {
+                    targetContent.style.display = "block";
+                } else {
+                    console.error(`Целевая секция с ID ${targetContentId} не найдена`);
+                }
+            }
         });
+    });
 
     const templates = {
         1: `<div class="horizontal-center roboto-regular">создать задачу</div>
@@ -399,7 +440,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <button class="button-cancel">Отменить</button>
             </div>`,
         2: `<form class="pd-15">
-            <input placeholder="Введите текст" class="form-txt" type="text" name="name" id="name" required />
+                <input placeholder="Введите текст" class="form-txt" type="text" name="name" id="name" required />
             </form>
             <div class="horizontal-center">
                 <button class="button-confirm">Подтвердить</button>
@@ -429,7 +470,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 createTask.style.display = 'block';
                 if (templates[menuType]) {
                     createTask.innerHTML = templates[menuType];
-                    console.log('menu type', menuType);
                     const positiveButton = createTask.querySelector('.button-or');
                     const negativeButton = createTask.querySelector('.button-or1');
 
@@ -440,7 +480,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         } else {
                             positiveButton.classList.remove('active');
                         }
-                        console.log('type', this.textContent.trim());
                     }
 
                     if (positiveButton && negativeButton) {
@@ -449,73 +488,33 @@ document.addEventListener("DOMContentLoaded", () => {
                         positiveButton.classList.add('active');
                     }
 
-                    async function addNewItem(name, type, isPositive) {
-                        if (type === 1) {
-                            const task = {
-                                name: name,
-                                is_done: false,
-                                user_id: user_id
-                            };
-
-                            try {
-                                const response = await fetch(`/users/${user_id}/tasks/`, {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify(task)
-                                });
-
-                                if (!response.ok) {
-                                    const errorText = await response.text();
-                                    throw new Error(`Ошибка сети при сохранении: ${response.status} - ${errorText}`);
-                                }
-                                await fetchTasks(`/users/${user_id}/tasks`, "task-list");
-
-                            } catch (error) {
-                                console.error('Ошибка при сохранении задачи', error);
-                            }
-                        } else if (type === 3) { // Habit
-                            const habit = {
-                                name: name,
-                                is_positive: isPositive,
-                                user_id: user_id
-                            };
-
-                            try {
-                                const response = await fetch(`/users/${user_id}/habit/`, {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify(habit)
-                                });
-
-                                if (!response.ok) {
-                                    const errorText = await response.text();
-                                    throw new Error(`Network error while saving: ${response.status} - ${errorText}`);
-                                }
-                                fetchHabities(`/users/${user_id}/habbites`, "habbities-list");
-
-                            } catch (error) {
-                                console.error('Error saving habit', error);
-                            }
-                        }
-                    }
-
                     const confirmButton = createTask.querySelector('.button-confirm');
                     if (confirmButton) {
-                        confirmButton.addEventListener('click', function () {
+                        confirmButton.addEventListener('click', async function () {
                             const input = createTask.querySelector('input');
                             if (input && input.value.trim() !== '') {
-                                const isPositive = positiveButton.classList.contains('active');
-                                addNewItem(input.value.trim(), menuType, isPositive);
+                                const isPositive = positiveButton ? positiveButton.classList.contains('active') : false;
+                                await addNewItem(input.value.trim(), menuType, isPositive);
                                 input.value = '';
+                                createTask.style.display = 'none'; // Hide menu
+                                addActivities.classList.remove('rotated');
                             }
+
+
+
                         });
                     } else {
                         console.error('Confirm button not found');
                     }
+
+                    const cancelButton = createTask.querySelector('.button-cancel');
+                    if (cancelButton) {
+                        cancelButton.addEventListener('click', function () {
+                            createTask.style.display = 'none'; // Hide menu
+                            addActivities.classList.remove('rotated');
+                        });
+                    }
+
                 } else {
                     createTask.innerHTML = `<div>Ошибка: шаблон не найден для значения ${menuType}.</div>`;
                 }
@@ -525,85 +524,62 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    const taskList = document.getElementById("task-list");
-    if (!taskList) {
-        console.error("Элемент с id 'task-list' не найден");
-        return;
-    }
+    async function addNewItem(name, type, isPositive) {
+        if (type === 1) { // Task
+            const task = {
+                name: name,
+                is_done: false,
+                user_id: user_id
+            };
 
-    function addCheckboxEventListeners(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv) {
-    // Селектор для всех чекбоксов
-    const checkboxes = document.querySelectorAll(".activities-checkBox-, .activities-checkBox-negative, .activities-checkBox.green");
+            try {
+                const response = await fetch(`/users/${user_id}/tasks/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(task)
+                });
 
-    checkboxes.forEach((box) => {
-        box.addEventListener("click", function () {
-            const isChecked = this.dataset.checked === "true";
-            const type = this.dataset.type;
-
-            if (type === "task") {
-                if (!isChecked) {
-                    this.dataset.checked = true;
-                    userData.mood = Math.min(100, userData.mood + 10);
-                    userData.money = Math.max(0, userData.money + 5);
-                    userData.score += 15;
-
-                    const taskElement = this.parentElement.parentElement;
-                    taskElement.classList.replace("activities-task", "activities-task-negative");
-                    this.classList.replace("activities-checkBox-", "activities-checkBox-greenMark");
-
-                    // Добавление задачи в выполненные
-                    completedTasksContainer.appendChild(taskElement);
-
-                    updateTaskAndLabelVisibility(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Ошибка сети при сохранении: ${response.status} - ${errorText}`);
                 }
-            } else if (type === "habit") {
-                const isPositive = this.dataset.positive === "true";
-                let times = parseInt(this.dataset.times, 10);
-                this.dataset.times = ++times;
-                const textElement = this.querySelector(".z-index-99");
-                if (textElement) {
-                    textElement.innerText = times;
-                }
+                fetchTasks(`/users/${user_id}/tasks`, "task-list"); // Обновление списка задач
 
-                userData.score += 10;
-
-                if (isPositive) {
-                    userData.mood = Math.min(100, userData.mood + 5);
-                    userData.money = Math.max(0, userData.money + 3);
-                } else {
-                    userData.mood = Math.max(0, userData.mood - 5);
-                    userData.money = Math.max(0, userData.money - 3);
-                }
+            } catch (error) {
+                console.error('Ошибка при сохранении задачи', error);
             }
+        } else if (type === 3) { // Habit
+            const habit = {
+                name: name,
+                is_positive: isPositive,
+                user_id: user_id
+            };
 
-            // Обновление информации о пользователе
-            updateUserInfo();
-        });
-    });
-}
-taskList.addEventListener("change", async (event) => {
-    if (event.target.matches(".task-checkbox")) {
-        const taskId = event.target.dataset.taskId;
-        const isChecked = event.target.checked;
+            try {
+                const response = await fetch(`/users/${user_id}/habit/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(habit)
+                });
 
-        try {
-            const response = await fetch(`/tasks/${taskId}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ is_done: isChecked })
-            });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Network error while saving: ${response.status} - ${errorText}`);
+                }
+                fetchHabities(`/users/${user_id}/habbites`, "habbities-list"); // Обновление списка привычек
 
-            if (!response.ok) {
-                throw new Error("Ошибка при обновлении состояния задачи");
+            } catch (error) {
+                console.error('Error saving habit', error);
             }
-
-            // После успешного обновления статуса, обновляем список задач
-            await fetchTasks(`/users/${user_id}/tasks`, "task-list");
-        } catch (error) {
-            console.error("Ошибка:", error);
         }
     }
 });
-});
+
+function updateTaskAndLabelVisibility(incompleteContainer, completeContainer, taskCountTextDiv, completedLabelTextDiv) {
+    taskCountTextDiv.style.display = incompleteContainer.children.length > 0 ? 'block' : 'none';
+    completedLabelTextDiv.style.display = completeContainer.children.length > 0 ? 'block' : 'none';
+}
