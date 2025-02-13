@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Body
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from datetime import datetime
 import uvicorn
@@ -20,6 +21,9 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+
 
 # Функция для записи изменений в журнал
 def log_change(db: Session, change_log: ChangeLogCreate):
@@ -137,6 +141,24 @@ def delete_level(levels_id: int, db: Session = Depends(get_db)):
 @app.get("/habbities/")
 def read_habbities(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return db.query(Habit).offset(skip).limit(limit).all()
+
+
+@app.post("/users/{user_id}/habit/")
+async def create_habit(user_id: int, habit: HabitCreate, db: Session = Depends(get_db)):
+    try:
+        # Создание новой привычки
+        new_habit = Habit(name=habit.name, is_positive=habit.is_positive, user_id=habit.user_id, times=habit.times)
+        db.add(new_habit)
+        db.commit()
+        db.refresh(new_habit)
+        return new_habit
+    except SQLAlchemyError as e:
+        db.rollback()  # Откат транзакции в случае ошибки
+        print(f"Database error: {e}")  # Логирование ошибки
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+    except Exception as e:
+        print(f"Unexpected error: {e}")  # Логирование любой другой ошибки
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @app.post("/habbities/")
 def create_habit(habit: HabitCreate, db: Session = Depends(get_db)):
@@ -292,6 +314,20 @@ def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
     return existing_task
 
 
+@app.patch("/users/{user_id}")
+def partial_update_user(user_id: int, user: UserPartialUpdate, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(User.user_id == user_id).first()
+    if existing_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    for key, value in user.dict(exclude_unset=True).items():
+        setattr(existing_user, key, value)
+
+    db.commit()
+    db.refresh(existing_user)
+
+    return existing_user
+
 # Эндпоинты для работы с ежедневными задачами
 @app.get("/dailies/")
 def read_dailies(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
@@ -335,6 +371,14 @@ def read_user_dailies(user_id: int, db: Session = Depends(get_db)):
     if not dailies:
         raise HTTPException(status_code=404, detail="dailies not found")
     return dailies
+
+
+@app.get("/users/{user_id}/dailies/{daily_id}")
+def read_user_daily(user_id: int, daily_id: int, db: Session = Depends(get_db)):
+    daily = db.query(Daily).filter(Daily.user_id == user_id, Daily.daily_id == daily_id).first()
+    if not daily:
+        raise HTTPException(status_code=404, detail="Daily task not found")
+    return daily
 
 @app.put("/dailies/{daily_id}")
 def update_daily(daily_id: int, daily: DailyUpdate, db: Session = Depends(get_db)):
@@ -427,10 +471,54 @@ def delete_repeatability(repeatability_id: int, db: Session = Depends(get_db)):
 
     return {"detail": "Repeatability deleted successfully"}
 
+
+@app.patch("/habits/{habit_id}/increment_times")
+async def increment_habit_times(habit_id: int, db: Session = Depends(get_db)):
+    try:
+        habit = db.query(Habit).filter(Habit.id == habit_id).first()
+        if not habit:
+            raise HTTPException(status_code=404, detail="Habit not found")
+
+        habit.times += 1
+        db.commit()
+        db.refresh(habit)
+        return habit
+    except SQLAlchemyError as e:
+        db.rollback()
+        print(f"Database error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 @app.get("/", response_class=HTMLResponse)
 async def read_index():
     with open("pages/index.html", "r", encoding="utf-8") as file:
         return HTMLResponse(content=file.read())
+
+
+@app.patch("/users/{user_id}/stats")
+def update_user_stats(user_id: int, db: Session = Depends(get_db), score: int = Body(None), mood: int = Body(None),
+                      money: int = Body(None)):
+    try:
+        existing_user = db.query(User).filter(User.user_id == user_id).first()
+        if existing_user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Обновляем только указанные поля, если они переданы
+        if score is not None:
+            existing_user.score = score
+        if mood is not None:
+            existing_user.mood = mood
+        if money is not None:
+            existing_user.money = money
+
+        db.commit()
+        db.refresh(existing_user)
+
+        return {"message": "User stats updated successfully", "user": existing_user}
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="An error occurred while updating the user")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)

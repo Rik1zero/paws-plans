@@ -20,6 +20,16 @@ class User(Base):
     money = Column(Integer, default=0)
     mood = Column(Integer, default=90)
 
+
+class UserPartialUpdate(BaseModel):
+   login: Optional[str] = None
+   email: Optional[str] = None
+   password: Optional[str] = None
+   level_id: Optional[int] = None
+   score: Optional[int] = None
+   money: Optional[int] = None
+   mood: Optional[int] = None
+
 class Level(Base):
     __tablename__ = 'levels'
     levels_id = Column(Integer, primary_key=True, index=True)
@@ -122,3 +132,12 @@ class ChangeLogCreate(BaseModel):
     operation: str
     timestamp: str
     user_id: int
+
+class Habit(Base):
+    __tablename__ = 'habits'
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    is_positive = Column(Boolean)
+    user_id = Column(Integer)
+    times = Column(Integer, default=0)
