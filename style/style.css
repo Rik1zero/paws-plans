@@ -94,6 +94,13 @@
   font-style: normal;
 }
 
+.roboto-bold-b {
+  font-weight: 700;
+  font-style: normal;
+  text-stroke: 2px #000000;
+  -webkit-text-stroke: 2px #000000;
+}
+
 .roboto-black {
   font-family: "Roboto", sans-serif;
   font-weight: 900;
@@ -157,16 +164,18 @@
 }
 
 .catPhoto {
-    height:180px;
-    width: 180px;
+    height:186px;
+    width: 186px;
     background:url(../source/fon_project1.png) no-repeat;
+    position:relative;
 }
 
-.catWindow{
-    width:186px;
-    height:186px;
+.catPhoto:after{
+    content:"";
     background:url(../source/border_backg.png) no-repeat;
-
+    z-index:4 !important;
+    position: absolute;
+    background-size: 100% 100%;
 }
 
 .inline div {
@@ -187,11 +196,7 @@
 
 .main {
     /* Дополнительные стили для .main */
-    width:100%;
     overflow-y:auto;
-}
-
-body {
     margin: 0 auto; /* Центрируем блоки */
     width: 100%; /* Задаем ширину 100%, чтобы сделать ее резиновой */
     max-width: 700px; /* Устанавливаем максимальную ширину */
@@ -199,6 +204,12 @@ body {
     display:flex;
     overflow:hidden;
 }
+
+body {
+    background: url('../source/mainFrame_backg.png') no-repeat;
+    background-filter: blur(4px);
+}
+
 
 html{height:100%;}
 
@@ -240,7 +251,8 @@ div.inline {
 
 .informationBlock {
     width: 100%;
-    padding: 10px;
+    padding: 10px 10px 10px 0;
+    margin-left:10px;
     display: flex;
     flex-direction: column;
 
@@ -263,7 +275,8 @@ div.inline {
     min-height:80vh;
     overflow: hidden;
     padding: 10px 10px 10px 10px;
-
+    margin-bottom:140px;
+    border-radius:0 0 10px 10px;
 }
 
 .task-line{
@@ -277,6 +290,7 @@ div.inline {
   display: flex;
   flex-direction: column;
   pudding-bottom:5px;
+  margin-bottom:10px;
 }
 
 .activities-task-negative {
@@ -527,11 +541,13 @@ div.inline {
 
 .menu {
     background: #567BFF; /* Цвет фона меню */
-    position: sticky;/* Фиксированное положение внизу */
-    bottom: 0; /* Прикреплено к нижней части */
-    width: 100%; /* Ширина 100% */
+    position: fixed;/* Фиксированное положение внизу */
+    bottom:0; /* Прикреплено к нижней части */
+    width: 100%; /* Задаем ширину 100%, чтобы сделать ее резиновой */
+    max-width: 700px;
     display: flex; /* Используем flex для равномерного распределения элементов */
     justify-content: space-between; /* Разделяет элементы равномерно */
+    border-radius:10px 10px 0 0;
 }
 
 .marker-button{
@@ -755,7 +771,7 @@ div.inline {
 }
 
 .create-task{
-    top:25%;
+    bottom:40vh;
     width:auto;
     position:absolute;
     height:fit-content;
