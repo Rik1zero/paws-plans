@@ -38,21 +38,21 @@ async function fetchTasks(endpoint, listElementId) {
         listElement.innerHTML = "";
 
         const taskCountTextDiv = document.createElement("div");
-        taskCountTextDiv.className = "task-header";
+        taskCountTextDiv.className = ".task-header";
         taskCountTextDiv.textContent = "Актуальные задачи:";
         listElement.appendChild(taskCountTextDiv);
 
         const incompleteTasksContainer = document.createElement("div");
-        incompleteTasksContainer.className = "task-container";
+        incompleteTasksContainer.className = ".task-container";
         listElement.appendChild(incompleteTasksContainer);
 
         const completedLabelTextDiv = document.createElement("div");
-        completedLabelTextDiv.className = "task-header-";
+        completedLabelTextDiv.className = ".task-header-";
         completedLabelTextDiv.textContent = "Выполненные задачи";
         listElement.appendChild(completedLabelTextDiv);
 
         const completedTasksContainer = document.createElement("div");
-        completedTasksContainer.className = "task-container";
+        completedTasksContainer.className = ".task-container";
         listElement.appendChild(completedTasksContainer);
 
         data.forEach((item) => {
