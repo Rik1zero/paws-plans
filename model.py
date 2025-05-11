@@ -133,11 +133,3 @@ class ChangeLogCreate(BaseModel):
     timestamp: str
     user_id: int
 
-class Habit(Base):
-    __tablename__ = 'habits'
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    is_positive = Column(Boolean)
-    user_id = Column(Integer)
-    times = Column(Integer, default=0)
