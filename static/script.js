@@ -1,5 +1,5 @@
 
-const user_id = 1;
+const user_id = 6;
 let userData = { score: 0, mood: 0, money: 0 };
 
 console.log("hi");
@@ -569,8 +569,7 @@ fetchTasks(`/users/${user_id}/tasks`, "task-list");
 fetchDailies(`/users/${user_id}/dailies`, "dailies-list");
 
 document.addEventListener("DOMContentLoaded", () => {
-    const userId = 1; // Используйте актуальный идентификатор пользователя
-    loadUserData(userId); // Загрузка данных при старте
+    loadUserData(user_id); // Загрузка данных при старте
 
     // Устанавливаем интервал для обновления данных
     setInterval(() => {

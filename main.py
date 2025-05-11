@@ -5,14 +5,19 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from datetime import datetime
 import uvicorn
+from sqlalchemy import inspect
+from model import Base, engine
 from model import *
-
+#Base.metadata.create_all(bind=engine)
 app = FastAPI()
 app.mount("/source", StaticFiles(directory="source"), name="source")
 app.mount("/static", StaticFiles(directory="static"), name="static")
-user_id = 1  # Здесь можно использовать реальный user_id
+user_id = 6  # Здесь можно использовать реальный user_id
 
 app.mount("/style", StaticFiles(directory="style"), name="style")
+
+
+
 
 # Зависимость для получения сессии базы данных
 def get_db():
@@ -451,6 +456,26 @@ def delete_daily(daily_id: int, db: Session = Depends(get_db)):
 def read_repeatabilities(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return db.query(Repeatability).offset(skip).limit(limit).all()
 
+
+def check_and_create_tables():
+    inspector = inspect(engine)
+    existing_tables = inspector.get_table_names()
+
+    # Получаем список всех таблиц, которые определены в моделях
+    all_tables = Base.metadata.tables.keys()
+
+    # Определяем таблицы, которых нет в базе данных
+    missing_tables = [table for table in all_tables if table not in existing_tables]
+
+    if missing_tables:
+        print(f"Следующие таблицы отсутствуют и будут созданы: {', '.join(missing_tables)}")
+        Base.metadata.create_all(bind=engine)
+        print("Таблицы успешно созданы.")
+    else:
+        print("Все таблицы уже существуют.")
+
+
+
 @app.delete("/repeatabilities/{repeatability_id}")
 def delete_repeatability(repeatability_id: int, db: Session = Depends(get_db)):
     repeatability = db.query(Repeatability).filter(Repeatability.repeatability_id == repeatability_id).first()
@@ -521,4 +546,6 @@ def update_user_stats(user_id: int, db: Session = Depends(get_db), score: int = 
         raise HTTPException(status_code=500, detail="An error occurred while updating the user")
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8001)
+    check_and_create_tables()
+
+    uvicorn.run(app, host="127.0.0.1", port=8000)

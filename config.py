@@ -1,1 +1,1 @@
-DATABASE_URL = "postgresql://postgres:12345@localhost:5432/paws-plans-db"
+DATABASE_URL = "postgresql://postgres:1@localhost:5432/paws-plans-db"

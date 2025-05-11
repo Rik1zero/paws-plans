@@ -133,15 +133,11 @@ ALTER TABLE IF EXISTS public.habbities
     ADD COLUMN is_positive boolean NOT NULL;
 
 
-INSERT INTO public.levels(level_top)
-	VALUES (0);
 
-INSERT INTO public.levels(level_top)
-	VALUES (500),(800),(1000),(2000);
 
 INSERT INTO public.users(
-	login, email, pass, level_id)
-	VALUES ('sasha','saha@m.r', '12345', 1);
+    login, email, pass, level_id)
+    VALUES ('sasha','saha@m.r', '12345', 1);
 
 INSERT INTO public.users(
 	login, email, pass, level_id,score, money, mood)

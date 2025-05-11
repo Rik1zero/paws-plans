@@ -4,6 +4,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pydantic import BaseModel
 from config import DATABASE_URL
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy.sql import func
+from sqlalchemy.orm import declarative_base, relationship
+
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -35,13 +39,17 @@ class Level(Base):
     levels_id = Column(Integer, primary_key=True, index=True)
     level_top = Column(Integer, nullable=False, default=0)
 
+
+
 class Habit(Base):
     __tablename__ = 'habbities'
-    habbit_id = Column(Integer, primary_key=True, index=True)
+    habit_id = Column(Integer, primary_key=True, index=True)
     name = Column(String(40), nullable=False)
     is_positive = Column(Boolean, nullable=False)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     times = Column(Integer, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    completed_at = Column(DateTime(timezone=True), nullable=True)
 
 class Task(Base):
     __tablename__ = 'tasks'
@@ -49,6 +57,8 @@ class Task(Base):
     name = Column(String(40), nullable=False)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     is_done = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    completed_at = Column(DateTime(timezone=True), nullable=True)
 
 class Daily(Base):
     __tablename__ = 'dailies'
@@ -57,6 +67,9 @@ class Daily(Base):
     repeatability_id = Column(Integer, ForeignKey('repeatabilities.repeatability_id'), nullable=False)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     is_done = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    completed_at = Column(DateTime(timezone=True), nullable=True)
+
 
 class Repeatability(Base):
     __tablename__ = 'repeatabilities'
