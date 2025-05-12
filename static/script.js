@@ -470,6 +470,73 @@ function addCheckboxEventListeners(incompleteTasksContainer, completedTasksConta
                     }
 
                     updateTaskAndLabelVisibility(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv);
+                }if (type === "daily") {
+                    // Переключение состояния дейликов
+                    const newCheckedState = !isChecked;
+                    this.dataset.checked = newCheckedState;
+
+                    const taskElement = this.parentElement.parentElement;
+                    if (newCheckedState) {
+                        // Пометить как выполненную
+                        userData.money = Math.max(0, userData.money + 5);
+
+                        if (userData.mood < 25) {
+                            userData.mood = Math.min(100, userData.mood + 15);
+                            userData.score += 10;
+                        } else if (userData.mood < 50 && userData.mood >= 25) {
+                            userData.mood = Math.min(100, userData.mood + 12);
+                            userData.score += 12;
+                        } else if (userData.mood < 75 && userData.mood >= 50) {
+                            userData.mood = Math.min(100, userData.mood + 10);
+                            userData.score += 15;
+                        } else if (userData.mood >= 75) {
+                            userData.mood = Math.min(100, userData.mood + 5);
+                            userData.score += 15;
+                        }
+
+                        taskElement.classList.replace(
+                            "activities-task",
+                            "activities-task-negative"
+                        );
+                        this.classList.replace(
+                            "activities-checkBox-",
+                            "activities-checkBox-greenMark"
+                        );
+
+                        completedTasksContainer.appendChild(taskElement);
+                    } else {
+                        // Пометить как невыполненную
+                        userData.money = Math.max(0, userData.money - 5);
+
+                        taskElement.classList.replace(
+                            "activities-task-negative",
+                            "activities-task"
+                        );
+                        this.classList.replace(
+                            "activities-checkBox-greenMark",
+                            "activities-checkBox-"
+                        );
+
+                        incompleteTasksContainer.appendChild(taskElement);
+                    }
+
+                    // Обновление дейлика на сервере
+                    try {
+
+                        const dailyId = this.dataset.id;
+                        console.log(`Updating daily with ID: ${dailyId}`);
+                        await fetch(`/dailies/${dailyId}/toggle`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ is_done: newCheckedState })
+                        });
+                    } catch (error) {
+                        console.error('Error updating daily state', error);
+                    }
+
+                    updateTaskAndLabelVisibility(incompleteTasksContainer, completedTasksContainer, taskCountTextDiv, completedLabelTextDiv);
                 } else if (type === "habit") {
                     console.log("+times")
                     const isPositive = this.dataset.positive === "true";
