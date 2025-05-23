@@ -182,11 +182,11 @@ function addCheckboxEventListeners(incompleteTasksContainer, completedTasksConta
 
                 if (newCheckedState) {
                     itemElement.classList.replace("activities-task", "activities-task-negative");
-                    this.classList.replace("activities-checkBox-", "activities-checkBox-greenMark");
+                    this.classList.replace("activities-checkBox", "activities-checkBox-greenMark");
                     completedTasksContainer.appendChild(itemElement);
                 } else {
                     itemElement.classList.replace("activities-task-negative", "activities-task");
-                    this.classList.replace("activities-checkBox-greenMark", "activities-checkBox-");
+                    this.classList.replace("activities-checkBox-greenMark", "activities-checkBox");
                     incompleteTasksContainer.appendChild(itemElement);
                 }
 
@@ -305,7 +305,8 @@ function addCheckboxEventListenersForHabits() {
                 const response = await fetch(`/habits/${habitId}/increment_times`, {
                     method: 'PATCH',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        // Include other headers if needed, such as Authorization
                     }
                 });
 
@@ -314,12 +315,18 @@ function addCheckboxEventListenersForHabits() {
                 }
 
                 const updatedHabit = await response.json();
-                console.log(`Habit ${updatedHabit.habit_id} times incremented to ${updatedHabit.times}`);
+
+                // Validate that the response contains the expected data
+                if (updatedHabit && updatedHabit.habit_id && updatedHabit.times) {
+                    console.log(`Habit ${updatedHabit.habit_id} times incremented to ${updatedHabit.times}`);
+                } else {
+                    console.error('Unexpected response format:', updatedHabit);
+                }
+
+                updateUserInfo();
             } catch (error) {
                 console.error('Error incrementing habit times:', error);
             }
-
-            updateUserInfo();
         });
     });
 }
