@@ -46,7 +46,6 @@ class Daily(Base):
     __tablename__ = 'dailies'
     daily_id = Column(Integer, primary_key=True, index=True)
     name = Column(String(40), nullable=False)
-    repeatability_id = Column(Integer, ForeignKey('repeatabilities.repeatability_id'), nullable=False)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     is_done = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
