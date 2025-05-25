@@ -108,6 +108,7 @@ def update_habit(habit_id: int, habit_update: HabitUpdate, db: Session = Depends
     return db_habit
 
 
+
 @router.delete("/habits/{habit_id}")
 def delete_habit(habit_id: int, db: Session = Depends(get_db)):
     db_habit = db.query(Habit).filter(Habit.habit_id == habit_id).first()
@@ -136,14 +137,22 @@ def read_task(task_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Task not found")
     return db_task
 
-
 @router.put("/tasks/{task_id}", response_model=TaskUpdate)
 def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depends(get_db)):
     db_task = db.query(Task).filter(Task.task_id == task_id).first()
     if not db_task:
         raise HTTPException(status_code=404, detail="Task not found")
-    for key, value in task_update.dict(exclude_unset=True).items():
+
+    update_data = task_update.dict(exclude_unset=True)
+
+    # Автоматически установить completed_at при is_done = True
+    if update_data.get("is_done") is True and db_task.completed_at is None:
+        update_data["completed_at"] = datetime.utcnow()
+    else:
+        update_data["completed_at"] = None
+    for key, value in update_data.items():
         setattr(db_task, key, value)
+
     db.commit()
     db.refresh(db_task)
     return db_task
@@ -202,15 +211,24 @@ def read_daily(daily_id: int, db: Session = Depends(get_db)):
     return db_daily
 
 
-@router.put("/dailies/{daily_id}", response_model=DailyUpdate)
-def update_daily(daily_id: int, daily_update: DailyUpdate, db: Session = Depends(get_db)):
+@router.put("/dailies/{daily_id}")
+def update_daily(daily_id: int, daily: DailyUpdate, db: Session = Depends(get_db)):
     db_daily = db.query(Daily).filter(Daily.daily_id == daily_id).first()
     if not db_daily:
-        raise HTTPException(status_code=404, detail="Daily not found")
-    for key, value in daily_update.dict(exclude_unset=True).items():
+        raise HTTPException(status_code=404, detail="Daily task not found")
+
+    update_data = daily.dict(exclude_unset=True)
+    if daily.is_done:
+        daily.completed_at = datetime.utcnow()
+    else:
+        daily.completed_at = None
+
+    for key, value in update_data.items():
         setattr(db_daily, key, value)
+
     db.commit()
     db.refresh(db_daily)
+
     return db_daily
 
 @router.get("/levels/{levels_id}")

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 from typing import Optional
 
@@ -60,6 +62,7 @@ class TaskUpdate(BaseModel):
     name: Optional[str] = None
     user_id: Optional[int] = None
     is_done: Optional[bool] = None
+    completed_at: Optional[datetime] = None
 
 # === Daily ===
 class DailyCreate(BaseModel):
@@ -73,6 +76,7 @@ class DailyUpdate(BaseModel):
     repeatability_id: Optional[int] = None
     user_id: Optional[int] = None
     is_done: Optional[bool] = None
+    completed_at: Optional[datetime] = None
 
 
 class LevelCreate(BaseModel):
