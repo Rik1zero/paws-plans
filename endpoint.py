@@ -1,17 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, Body
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
-from config import USER_ID as user_id
 from models import User, Level, Habit, Task, Daily
 from schemas import (
     UserCreate, UserUpdate, UserPartialUpdate,
     HabitCreate, HabitUpdate,
     TaskCreate, TaskUpdate,
-    DailyCreate, DailyUpdate, LevelCreate, UserRead,
+    DailyCreate, DailyUpdate, LevelCreate, UserRead
 )
 from database import get_db
-
-
 
 router = APIRouter()
 
@@ -38,8 +35,10 @@ def update_user(user_id: int, user_update: UserUpdate, db: Session = Depends(get
     db_user = db.query(User).filter(User.user_id == user_id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
+
     for key, value in user_update.dict(exclude_unset=True).items():
         setattr(db_user, key, value)
+
     db.commit()
     db.refresh(db_user)
     return db_user
@@ -52,7 +51,6 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     db.delete(db_user)
     db.commit()
-
     return {"detail": "User deleted"}
 
 
@@ -61,11 +59,22 @@ def partial_update_user(user_id: int, user_update: UserPartialUpdate, db: Sessio
     db_user = db.query(User).filter(User.user_id == user_id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
+
     for key, value in user_update.dict(exclude_unset=True).items():
         setattr(db_user, key, value)
+
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+# === Levels ===
+@router.get("/levels/{levels_id}")
+def read_level(levels_id: int, db: Session = Depends(get_db)):
+    level = db.query(Level).filter(Level.levels_id == levels_id).first()
+    if not level:
+        raise HTTPException(status_code=404, detail="Level not found")
+    return level
 
 
 @router.delete("/levels/{levels_id}")
@@ -96,17 +105,23 @@ def read_habit(habit_id: int, db: Session = Depends(get_db)):
     return db_habit
 
 
-@router.put("/habits/{habit_id}", response_model=HabitUpdate)
-def update_habit(habit_id: int, habit_update: HabitUpdate, db: Session = Depends(get_db)):
+@router.put("/habits/{habit_id}")
+def update_habit(habit_id: int, habit: HabitUpdate, db: Session = Depends(get_db)):
     db_habit = db.query(Habit).filter(Habit.habit_id == habit_id).first()
     if not db_habit:
         raise HTTPException(status_code=404, detail="Habit not found")
-    for key, value in habit_update.dict(exclude_unset=True).items():
+
+    update_data = habit.dict(exclude_unset=True)
+
+    if update_data.get("is_done") is True and db_habit.completed_at is None:
+        update_data["completed_at"] = datetime.utcnow()
+
+    for key, value in update_data.items():
         setattr(db_habit, key, value)
+
     db.commit()
     db.refresh(db_habit)
     return db_habit
-
 
 
 @router.delete("/habits/{habit_id}")
@@ -116,7 +131,6 @@ def delete_habit(habit_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Habit not found")
     db.delete(db_habit)
     db.commit()
-
     return {"detail": "Habit deleted"}
 
 
@@ -137,6 +151,7 @@ def read_task(task_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Task not found")
     return db_task
 
+
 @router.put("/tasks/{task_id}", response_model=TaskUpdate)
 def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depends(get_db)):
     db_task = db.query(Task).filter(Task.task_id == task_id).first()
@@ -145,11 +160,9 @@ def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depends(get
 
     update_data = task_update.dict(exclude_unset=True)
 
-    # Автоматически установить completed_at при is_done = True
     if update_data.get("is_done") is True and db_task.completed_at is None:
         update_data["completed_at"] = datetime.utcnow()
-    else:
-        update_data["completed_at"] = None
+
     for key, value in update_data.items():
         setattr(db_task, key, value)
 
@@ -157,31 +170,6 @@ def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depends(get
     db.refresh(db_task)
     return db_task
 
-
-@router.get("/users/{user_id}/tasks")
-def read_user_tasks(user_id: int, db: Session = Depends(get_db)):
-    tasks = db.query(Task).filter(Task.user_id == user_id).all()
-    if not tasks:
-        raise HTTPException(status_code=404, detail="Задачи не найдены")
-    return tasks
-
-
-# === Получение ежедневных задач пользователя ===
-@router.get("/users/{user_id}/dailies")
-def read_user_dailies(user_id: int, db: Session = Depends(get_db)):
-    dailies = db.query(Daily).filter(Daily.user_id == user_id).all()
-    if not dailies:
-        raise HTTPException(status_code=404, detail="Ежедневные задачи не найдены")
-    return dailies
-
-
-# === Получение привычек пользователя ===
-@router.get("/users/{user_id}/habits")
-def read_user_habits(user_id: int, db: Session = Depends(get_db)):
-    habits = db.query(Habit).filter(Habit.user_id == user_id).all()
-    if not habits:
-        raise HTTPException(status_code=404, detail="Привычки не найдены")
-    return habits
 
 @router.delete("/tasks/{task_id}")
 def delete_task(task_id: int, db: Session = Depends(get_db)):
@@ -218,25 +206,19 @@ def update_daily(daily_id: int, daily: DailyUpdate, db: Session = Depends(get_db
         raise HTTPException(status_code=404, detail="Daily task not found")
 
     update_data = daily.dict(exclude_unset=True)
+
     if daily.is_done:
-        daily.completed_at = datetime.utcnow()
+        update_data["completed_at"] = datetime.utcnow()
     else:
-        daily.completed_at = None
+        update_data["completed_at"] = None
 
     for key, value in update_data.items():
         setattr(db_daily, key, value)
 
     db.commit()
     db.refresh(db_daily)
-
     return db_daily
 
-@router.get("/levels/{levels_id}")
-def read_level(levels_id: int, db: Session = Depends(get_db)):
-    level = db.query(Level).filter(Level.levels_id == levels_id).first()
-    if not level:
-        raise HTTPException(status_code=404, detail="Level not found")
-    return level
 
 @router.delete("/dailies/{daily_id}")
 def delete_daily(daily_id: int, db: Session = Depends(get_db)):
@@ -247,3 +229,78 @@ def delete_daily(daily_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"detail": "Daily deleted"}
 
+
+# === Получение данных пользователя ===
+@router.get("/users/{user_id}/full")
+def get_full_user_info(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    tasks = db.query(Task).filter(Task.user_id == user_id).all()
+    habits = db.query(Habit).filter(Habit.user_id == user_id).all()
+    dailies = db.query(Daily).filter(Daily.user_id == user_id).all()
+
+    return {
+        "user": user,
+        "tasks": tasks,
+        "habits": habits,
+        "dailies": dailies
+    }
+
+
+@router.get("/users/{user_id}/habits")
+def read_user_habits(user_id: int, db: Session = Depends(get_db)):
+    habits = db.query(Habit).filter(Habit.user_id == user_id).all()
+    if not habits:
+        raise HTTPException(status_code=404, detail="Habits not found")
+    return habits
+
+
+@router.get("/users/{user_id}/dailies")
+def read_user_dailies(user_id: int, db: Session = Depends(get_db)):
+    dailies = db.query(Daily).filter(Daily.user_id == user_id).all()
+    if not dailies:
+        raise HTTPException(status_code=404, detail="Dailies not found")
+    return dailies
+
+@router.patch("/tasks/{task_id}/toggle")
+def toggle_task_status(task_id: int, db: Session = Depends(get_db)):
+    task = db.query(Task).filter(Task.task_id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Задача не найдена")
+
+    # Переключаем статус is_done
+    task.is_done = not task.is_done
+
+    # Обновляем время завершения
+    task.completed_at = datetime.utcnow() if task.is_done else None
+
+    db.commit()
+    db.refresh(task)
+
+    return {"task_id": task.task_id, "is_done": task.is_done}
+
+@router.patch("/dailies/{daily_id}/toggle")
+def toggle_daily_status(daily_id: int, db: Session = Depends(get_db)):
+    daily = db.query(Daily).filter(Daily.daily_id == daily_id).first()
+    if not daily:
+        raise HTTPException(status_code=404, detail="Ежедневная задача не найдена")
+
+    # Переключаем статус is_done
+    daily.is_done = not daily.is_done
+
+    # Обновляем время завершения
+    daily.completed_at = datetime.utcnow() if daily.is_done else None
+
+    db.commit()
+    db.refresh(daily)
+
+    return {"daily_id": daily.daily_id, "is_done": daily.is_done}
+
+@router.get("/users/{user_id}/tasks")
+def read_user_tasks(user_id: int, db: Session = Depends(get_db)):
+    tasks = db.query(Task).filter(Task.user_id == user_id).all()
+    if not tasks:
+        raise HTTPException(status_code=404, detail="Tasks not found")
+    return tasks

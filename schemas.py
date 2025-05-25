@@ -51,6 +51,7 @@ class HabitUpdate(BaseModel):
     is_positive: Optional[bool] = None
     user_id: Optional[int] = None
     times: Optional[int] = None
+    completed_at: Optional[datetime] = None
 
 # === Task ===
 class TaskCreate(BaseModel):
